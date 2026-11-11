@@ -1,0 +1,308 @@
+// Tests des classes Guerrier, Clerc, Paladin, Ensorceleur et Artificier (modules réels).
+// Appelé depuis tests/run.js : require("./classes.js")(DND, eq).
+module.exports = function (DND, eq) {
+  const E = DND.engine;
+  const base = (abilities) => {
+    const ch = E.newCharacter();
+    Object.assign(ch.abilities, abilities);
+    return ch;
+  };
+  const res = (s, id) => s.resources.find((r) => r.id === id);
+
+  // --- Guerrier ---
+  let ch = base({ str: 16, dex: 14, con: 14, int: 10, wis: 12, cha: 8 });
+  ch.classes = [{ id: "fighter", level: 1, subclass: "", choices: {
+    skills: ["skill.athletics", "skill.perception"], fightingStyle: ["defense"], masteries: ["longsword", "greatsword", "longbow"] } }];
+  ch.inventory = [{ id: "chain-mail", qty: 1, equipped: true }, { id: "longsword", qty: 1, equipped: true }];
+  let s = E.compute(ch);
+  eq("Guerrier 1 : PV 10 + CON 2", s.hp.max, 12);
+  eq("Guerrier 1 : JS FOR et CON", [s.abilities.str.save.proficient, s.abilities.con.save.proficient, s.abilities.dex.save.proficient], [true, true, false]);
+  eq("Guerrier 1 : Défense (+1 CA en armure)", s.ac.value, 17);
+  eq("Guerrier 1 : Second souffle ×2, 1 au repos court", [res(s, "fighter.secondWind").max, res(s, "fighter.secondWind").shortRegain], [2, 1]);
+  eq("Guerrier 1 : botte de l'épée longue affichée", !!s.attacks.find((a) => a.nameEn === "Longsword").mastery, true);
+  eq("Guerrier 1 : 3 bottes à choisir", s.choices.find((c) => c.key === "masteries").count, 3);
+  eq("Guerrier 1 : couleur", s.accent, "#7a2e22");
+  eq("Guerrier 1 : pas d'erreur", s.errors, []);
+
+  ch.classes[0].level = 10;
+  ch.classes[0].subclass = "champion";
+  s = E.compute(ch);
+  eq("Guerrier 10 : Second souffle ×4", res(s, "fighter.secondWind").max, 4);
+  eq("Guerrier 10 : Fougue au repos court", res(s, "fighter.actionSurge").recharge, "short");
+  eq("Guerrier 10 : Inflexible ×1", res(s, "fighter.indomitable").max, 1);
+  eq("Guerrier 10 : 5 bottes", s.choices.find((c) => c.key === "masteries").count, 5);
+  eq("Champion : avantage à l'initiative", s.initiative.advantage, ["Athlète accompli"]);
+  eq("Champion : 2e style de combat proposé", s.choices.some((c) => c.key === "sub:champion/fightingStyle2"), true);
+  eq("Guerrier 10 : dons aux niveaux 4, 6 et 8", ["feat4", "feat6", "feat8"].every((k) => s.choices.some((c) => c.key === k)), true);
+
+  ch.classes[0].subclass = "battle-master";
+  ch.classes[0].choices["sub:battle-master/maneuvers"] = ["riposte", "trip-attack", "parry"];
+  s = E.compute(ch);
+  eq("Maître de guerre : 5 dés de supériorité au niveau 10", res(s, "fighter.superiorityDice").max, 5);
+  eq("Maître de guerre : 7 manœuvres au niveau 10", s.choices.find((c) => c.key === "sub:battle-master/maneuvers").count, 7);
+  eq("Maître de guerre : DD des manœuvres (8 + 4 + FOR 3)", s.actions.find((a) => a.name.en === "Trip Attack").description.includes("DD 15"), true);
+  eq("Maître de guerre : dés d10 au niveau 10", s.actions.some((a) => a.actionType === "passive" && a.description.includes("d10")), true);
+
+  ch.classes[0].subclass = "eldritch-knight";
+  ch.classes[0].level = 7;
+  s = E.compute(ch);
+  eq("Chevalier occulte 7 : emplacements 4/2", s.spellSlots.map((x) => x.max), [4, 2]);
+  eq("Chevalier occulte 7 : Intelligence, 2 sorts mineurs, 5 sorts", [s.casting[0].ability, s.casting[0].cantrips, s.casting[0].prepared], ["int", 2, 5]);
+  ch.classes[0].level = 4;
+  eq("Chevalier occulte 4 : 3 emplacements de niveau 1", E.compute(ch).spellSlots.map((x) => x.max), [3]);
+  eq("Sorts de magicien de niveau 0 à 2 au catalogue", Object.values(DND.data.spells).filter((x) => x.lists.includes("wizard") && x.level <= 2).length >= 70, true);
+
+  ch.classes[0].subclass = "psi-warrior";
+  ch.classes[0].level = 5;
+  s = E.compute(ch);
+  eq("Soldat psi 5 : 6 dés psioniques, 1 au repos court", [res(s, "fighter.psionicDice").max, res(s, "fighter.psionicDice").shortRegain], [6, 1]);
+  eq("Subclasses du guerrier", E.subclassesOf(DND.modules.class.fighter).map((x) => x.id), ["champion", "eldritch-knight", "battle-master", "psi-warrior"]);
+  eq("Guerrier : pas d'erreur", s.errors, []);
+
+  // --- Clerc ---
+  ch = base({ str: 10, dex: 12, con: 14, int: 10, wis: 16, cha: 13 });
+  ch.classes = [{ id: "cleric", level: 1, subclass: "", choices: { skills: ["skill.medicine", "skill.religion"], divineOrder: ["thaumaturge"],
+    "divineOrder/thaumaturge/cantrip": ["guidance"] } }];
+  ch.spells = [{ id: "sacred-flame", source: "cleric" }, { id: "bless", source: "cleric" }];
+  s = E.compute(ch);
+  eq("Clerc 1 : PV 8 + CON 2", s.hp.max, 10);
+  eq("Clerc 1 : DD 13, 3 sorts mineurs, 4 sorts préparés, 2 emplacements", [s.casting[0].dc, s.casting[0].cantrips, s.casting[0].prepared, s.spellSlots[0].max], [13, 3, 4, 2]);
+  eq("Thaumaturge : Assistance en plus", !!s.spells.find((x) => x.spell.id === "guidance" && x.alwaysPrepared), true);
+  eq("Thaumaturge : Religion +3 (SAG) +2 (maîtrise) +0", s.skills.religion.bonus, 5);
+  eq("Thaumaturge : Arcanes +3", s.skills.arcana.bonus, 3);
+  eq("Clerc 1 : pas encore de Conduit divin", res(s, "cleric.channelDivinity"), undefined);
+  ch.classes[0].choices.divineOrder = ["protector"];
+  s = E.compute(ch);
+  eq("Protecteur : armures lourdes et armes de guerre", [!!s.prof["armor.heavy"], !!s.prof["weapon.martial"]], [true, true]);
+
+  ch.classes[0].level = 7;
+  ch.classes[0].subclass = "life";
+  ch.classes[0].choices.blessedStrikes = ["potent-spellcasting"];
+  s = E.compute(ch);
+  eq("Clerc 7 : Conduit divin ×3, 1 au repos court", [res(s, "cleric.channelDivinity").max, res(s, "cleric.channelDivinity").shortRegain], [3, 1]);
+  eq("Clerc 7 : emplacements 4/3/3/1", s.spellSlots.map((x) => x.max), [4, 3, 3, 1]);
+  eq("Clerc 7 : 11 sorts préparés", s.casting[0].prepared, 11);
+  eq("Vie : sorts de domaine jusqu'au niveau 7", ["aid", "mass-healing-word", "death-ward"].every((id) => s.spells.some((x) => x.spell.id === id && x.alwaysPrepared)), true);
+  eq("Vie : pas encore les sorts du niveau 9", s.spells.some((x) => x.spell.id === "mass-cure-wounds"), false);
+  eq("Incantation puissante : Flamme sacrée 2d8+3", s.spells.find((x) => x.spell.id === "sacred-flame").damage, "2d8+3 radiant");
+  eq("Survivance : 35 PV", s.actions.find((a) => a.name.en === "Preserve Life").description.includes("35 PV"), true);
+  eq("Étincelle divine 2d8 au niveau 7", s.actions.find((a) => a.name.en === "Divine Spark").description.includes("2d8"), true);
+  eq("Calcination : 3d8", s.actions.find((a) => a.name.en === "Turn Undead").description.includes("3d8"), true);
+
+  ch.classes[0].level = 10;
+  ch.classes[0].subclass = "war";
+  s = E.compute(ch);
+  eq("Clerc 10 : Intervention divine", res(s, "cleric.divineIntervention").max, 1);
+  eq("Guerre : Prêtre de guerre = SAG, repos court", [res(s, "cleric.warPriest").max, res(s, "cleric.warPriest").recharge], [3, "short"]);
+  ch.classes[0].subclass = "light";
+  s = E.compute(ch);
+  eq("Lumière : Oeil du mage préparé (sort de domaine hors liste)", s.spells.some((x) => x.spell.id === "arcane-eye" && x.alwaysPrepared), true);
+  eq("Oeil du mage n'est plus sur la liste du clerc", DND.data.spells["arcane-eye"].lists.includes("cleric"), false);
+  eq("Lumière : Éclat protecteur = SAG", res(s, "cleric.wardingFlare").max, 3);
+  ch.classes[0].subclass = "trickery";
+  s = E.compute(ch);
+  eq("Domaines du clerc", E.subclassesOf(DND.modules.class.cleric).map((x) => x.id), ["life", "light", "trickery", "war", "grave"]);
+  ch.classes[0].subclass = "grave";
+  ch.classes[0].level = 3;
+  s = E.compute(ch);
+  eq("Tombe 3 : sorts de domaine du niveau 3 (Stabilisation hors sorts mineurs), pas ceux du niveau 5", [["detect-evil-and-good", "false-life", "gentle-repose", "ray-of-enfeeblement", "spare-the-dying"].every((id) => s.spells.some((x) => x.spell.id === id && x.alwaysPrepared)), s.casting[0].cantrips, s.spells.some((x) => x.spell.id === "revivify")], [true, 3, false]);
+  eq("Tombe 3 : Chemin de la tombe = action bonus, Conduit divin, +3 dégâts", ((a) => [a.actionType, a.resource, a.description.includes("+3 dégâts")])(s.actions.find((a) => a.name.en === "Path to the Grave")), ["bonus", "cleric.channelDivinity", true]);
+  eq("Tombe 3 : Repousser la mort 1d4, pas encore de Sentinelle", [s.actions.find((a) => a.name.en === "Circle of Mortality").description.includes("+1d4"), res(s, "cleric.sentinelAtDeathsDoor")], [true, undefined]);
+  ch.classes[0].level = 10;
+  s = E.compute(ch);
+  eq("Tombe 10 : Sentinelle au seuil de la mort = SAG, repos long", [res(s, "cleric.sentinelAtDeathsDoor").max, res(s, "cleric.sentinelAtDeathsDoor").recharge], [3, "long"]);
+  eq("Tombe 10 : Dissipation du mal et du bien et Rappel à la vie préparés", ["dispel-evil-and-good", "raise-dead"].every((id) => s.spells.some((x) => x.spell.id === id && x.alwaysPrepared)), true);
+  ch.classes[0].level = 17;
+  s = E.compute(ch);
+  eq("Tombe 17 : Repousser la mort 1d6, Gardien des âmes 1/repos court, 34 PV", [s.actions.find((a) => a.name.en === "Circle of Mortality").description.includes("+1d6"), res(s, "cleric.keeperOfSouls").max, res(s, "cleric.keeperOfSouls").recharge, res(s, "cleric.keeperOfSouls").description.startsWith("34 ")], [true, 1, "short", true]);
+  eq("Tombe : pas d'erreur", s.errors, []);
+  ch.classes[0].subclass = "trickery";
+  s = E.compute(ch);
+  eq("Sorts de clerc de niveau 0 à 5 au catalogue", Object.values(DND.data.spells).filter((x) => x.lists.includes("cleric")).length, 87);
+  eq("Clerc : pas d'erreur", s.errors, []);
+
+  // --- Paladin ---
+  ch = base({ str: 16, dex: 10, con: 14, int: 8, wis: 10, cha: 16 });
+  ch.classes = [{ id: "paladin", level: 1, subclass: "", choices: { skills: ["skill.athletics", "skill.persuasion"], masteries: ["longsword", "javelin"] } }];
+  ch.inventory = [{ id: "chain-mail", qty: 1, equipped: true }, { id: "shield", qty: 1, equipped: true }, { id: "longsword", qty: 1, equipped: true }];
+  s = E.compute(ch);
+  eq("Paladin 1 : PV 10 + CON 2", s.hp.max, 12);
+  eq("Paladin 1 : 2 emplacements de niveau 1, 2 sorts préparés", [s.spellSlots.map((x) => x.max), s.casting[0].prepared], [[2], 2]);
+  eq("Paladin 1 : Imposition des mains 5 PV", res(s, "paladin.layOnHands").max, 5);
+  eq("Paladin 1 : CA 18", s.ac.value, 18);
+  eq("Paladin 1 : 2 bottes", s.choices.find((c) => c.key === "masteries").count, 2);
+
+  ch.classes[0].level = 2;
+  ch.classes[0].choices.fightingStyle = ["blessed-warrior"];
+  ch.classes[0].choices["fightingStyle/blessed-warrior/cantrips"] = ["sacred-flame", "guidance"];
+  s = E.compute(ch);
+  eq("Combattant béni : Flamme sacrée au Charisme (DD 13)", s.spells.find((x) => x.spell.id === "sacred-flame").dc, 13);
+  eq("Châtiment de paladin : Châtiment divin gratuit 1/repos long", !!res(s, "spell:paladin:divine-smite"), true);
+  ch.classes[0].choices.fightingStyle = ["defense"];
+  eq("Style de combat Défense : CA 19", E.compute(ch).ac.value, 19);
+
+  ch.classes[0].level = 6;
+  ch.classes[0].subclass = "devotion";
+  s = E.compute(ch);
+  eq("Paladin 6 : emplacements 4/2 (demi-lanceur arrondi au supérieur)", s.spellSlots.map((x) => x.max), [4, 2]);
+  eq("Paladin 6 : Imposition des mains 30", res(s, "paladin.layOnHands").max, 30);
+  eq("Aura de protection : JS SAG +0 +3 maîtrise +3 CHA", s.abilities.wis.save.bonus, 6);
+  eq("Aura de protection : JS FOR +3 +3", s.abilities.str.save.bonus, 6);
+  eq("Paladin 6 : Fidèle destrier gratuit", !!res(s, "spell:paladin:find-steed"), true);
+  eq("Dévotion : sorts du serment niv. 3 et 5", ["shield-of-faith", "zone-of-truth"].every((id) => s.spells.some((x) => x.spell.id === id && x.alwaysPrepared)), true);
+  eq("Dévotion : pas encore les sorts du niveau 9", s.spells.some((x) => x.spell.id === "beacon-of-hope"), false);
+  eq("Paladin 6 : Conduit divin ×2", res(s, "paladin.channelDivinity").max, 2);
+
+  ch.classes[0].level = 10;
+  ch.classes[0].subclass = "glory";
+  s = E.compute(ch);
+  eq("Gloire : Aura d'entrain +3 m (vitesse 40 pieds)", s.speed.walk, 40);
+  eq("Paladin 10 : emplacements 4/3/2", s.spellSlots.map((x) => x.max), [4, 3, 2]);
+  eq("Abjuration d'ennemis : DD 15, 3 cibles", s.actions.find((a) => a.name.en === "Abjure Foes").description.includes("DD 15") && s.actions.find((a) => a.name.en === "Abjure Foes").description.includes("jusqu'à 3"), true);
+  ch.classes[0].subclass = "ancients";
+  s = E.compute(ch);
+  eq("Anciens : résistances", s.resistances, ["necrotic", "psychic", "radiant"]);
+  eq("Serments du paladin", E.subclassesOf(DND.modules.class.paladin).map((x) => x.id), ["ancients", "devotion", "glory", "vengeance"]);
+  ch.classes[0].subclass = "vengeance";
+  eq("Paladin : pas d'erreur", E.compute(ch).errors, []);
+
+  // Multiclassage Paladin 3 / Clerc 2 : niveau de lanceur 2 + 2 = 4
+  ch.classes = [{ id: "paladin", level: 3, choices: {} }, { id: "cleric", level: 2, choices: {} }];
+  ch.abilities.wis = 13;
+  eq("Multiclasse Paladin 3 / Clerc 2 : emplacements 4/3", E.compute(ch).spellSlots.map((x) => x.max), [4, 3]);
+
+  // --- Ensorceleur ---
+  ch = base({ str: 8, dex: 14, con: 14, int: 10, wis: 12, cha: 16 });
+  ch.classes = [{ id: "sorcerer", level: 1, subclass: "", choices: { skills: ["skill.arcana", "skill.persuasion"] } }];
+  ch.spells = [{ id: "fire-bolt", source: "sorcerer" }, { id: "sorcerous-burst", source: "sorcerer" }];
+  s = E.compute(ch);
+  eq("Ensorceleur 1 : PV 6 + CON 2", s.hp.max, 8);
+  eq("Ensorceleur 1 : JS CON et CHA", [s.abilities.con.save.proficient, s.abilities.cha.save.proficient], [true, true]);
+  eq("Ensorceleur 1 : 4 sorts mineurs, 2 sorts préparés, DD 13", [s.casting[0].cantrips, s.casting[0].prepared, s.casting[0].dc], [4, 2, 13]);
+  eq("Ensorceleur 1 : Sorcellerie innée ×2, pas de points", [res(s, "sorcerer.innateSorcery").max, res(s, "sorcerer.sorceryPoints")], [2, undefined]);
+  eq("Éruption ensorcelée dans les attaques", s.attacks.find((a) => a.name === "Éruption ensorcelée").damage, "1d8 type au choix");
+
+  ch.classes[0].level = 5;
+  ch.classes[0].subclass = "draconic";
+  ch.classes[0].choices.metamagic = ["quickened-spell", "twinned-spell"];
+  s = E.compute(ch);
+  eq("Ensorceleur 5 : 5 points de sorcellerie", res(s, "sorcerer.sorceryPoints").max, 5);
+  eq("Ensorceleur 5 : Restauration ensorcelée", res(s, "sorcerer.sorcerousRestoration").max, 1);
+  eq("Ensorceleur 5 : emplacements 4/3/2, 9 sorts", [s.spellSlots.map((x) => x.max), s.casting[0].prepared], [[4, 3, 2], 9]);
+  eq("Draconique : PV 6 + 4×4 + 5×CON 2 + 5", s.hp.max, 6 + 16 + 10 + 5);
+  eq("Draconique : CA 10 + DEX 2 + CHA 3", s.ac.value, 15);
+  eq("Draconique : sorts niv. 3 et 5", ["dragons-breath", "fly"].every((id) => s.spells.some((x) => x.spell.id === id && x.alwaysPrepared)), true);
+  eq("Métamagie : Sort accéléré dans les actions", s.actions.some((a) => a.name.en === "Quickened Spell"), true);
+  eq("Création d'emplacements jusqu'au niveau 3", s.actions.find((a) => a.name.en === "Creating Spell Slots").description.includes("niv. 3 : 5 pts"), true);
+
+  ch.classes[0].level = 10;
+  ch.classes[0].choices["sub:draconic/affinity"] = ["fire"];
+  s = E.compute(ch);
+  eq("Ensorceleur 10 : 4 options de Métamagie, 6 sorts mineurs", [s.choices.find((c) => c.key === "metamagic").count, s.casting[0].cantrips], [4, 6]);
+  eq("Affinité élémentaire : résistance au feu", s.resistances, ["fire"]);
+  ch.classes[0].subclass = "wild-magic";
+  eq("Sauvage : Marée du chaos", !!res(E.compute(ch), "sorcerer.tidesOfChaos"), true);
+  ch.classes[0].subclass = "aberrant";
+  eq("Aberrante : résistance psychique", E.compute(ch).resistances, ["psychic"]);
+  ch.classes[0].subclass = "clockwork";
+  s = E.compute(ch);
+  eq("Mécanique : Rétablir l'équilibre = CHA", res(s, "sorcerer.restoreBalance").max, 3);
+  eq("Mécanique : pas d'erreur", s.errors, []);
+  ch.classes[0].subclass = "storm";
+  ch.classes[0].level = 5;
+  s = E.compute(ch);
+  eq("Tempêtes 5 : primordial, Magie tumultueuse, pas encore de résistance", [s.proficiencies.languages.includes("language.primordial"), s.actions.some((a) => a.name.en === "Tempestuous Magic"), s.resistances], [true, true, []]);
+  ch.classes[0].level = 10;
+  s = E.compute(ch);
+  eq("Tempêtes 10 : résistance foudre et tonnerre", s.resistances.slice().sort(), ["lightning", "thunder"]);
+  eq("Tempêtes 10 : Cœur de la tempête = 5 dégâts", s.actions.some((a) => a.name.fr === "Cœur de la tempête" && / 5 dégâts/.test(a.description)), true);
+  eq("Tempêtes 10 : Guide des tempêtes (2 actions)", s.actions.filter((a) => /^Storm Guide/.test(a.name.en)).length, 2);
+  eq("Sous-classes de l'ensorceleur", E.subclassesOf(DND.modules.class.sorcerer).map((x) => x.id), ["draconic", "wild-magic", "aberrant", "clockwork", "storm"]);
+  eq("Sorts d'ensorceleur de niveau 0 à 5 au catalogue", Object.values(DND.data.spells).filter((x) => x.lists.includes("sorcerer")).length, 119);
+  eq("Ensorceleur : pas d'erreur", s.errors, []);
+
+  // --- Artificier ---
+  ch = base({ str: 10, dex: 14, con: 14, int: 16, wis: 12, cha: 8 });
+  ch.classes = [{ id: "artificer", level: 1, subclass: "", choices: { skills: ["skill.arcana", "skill.investigation"], artisanTool: ["tool.smiths-tools"] } }];
+  s = E.compute(ch);
+  eq("Artificier 1 : PV 8 + CON 2", s.hp.max, 10);
+  eq("Artificier 1 : JS CON et INT", [s.abilities.con.save.proficient, s.abilities.int.save.proficient], [true, true]);
+  eq("Artificier 1 : 1 emplacement de niv. 1 ×2, DD 13 (INT)", [s.spellSlots.map((x) => x.max), s.casting[0].dc], [[2], 13]);
+  eq("Artificier 1 : Magie de bricoleur = INT", res(s, "artificer.tinkersMagic").max, 3);
+  eq("Artificier 1 : couleur", s.accent, "#b8622e");
+  eq("Artificier 1 : Réparation connue (Magie de bricoleur)", s.spells.some((x) => x.spell.id === "mending"), true);
+  eq("Artificier 1 : outils de voleur et de bricoleur", [!!s.prof["tool.thieves-tools"], !!s.prof["tool.tinkers-tools"]], [true, true]);
+  {
+    const mc = base({ str: 10, dex: 14, con: 14, int: 16, wis: 12, cha: 13 });
+    mc.classes = [{ id: "warlock", level: 1, subclass: "", choices: {} }, { id: "artificer", level: 1, subclass: "", choices: {} }];
+    const m = E.compute(mc);
+    eq("Artificier en multiclasse : bricoleur seulement", [!!m.prof["tool.thieves-tools"], !!m.prof["tool.tinkers-tools"]], [false, true]);
+    eq("Artificier en multiclasse : 1 compétence au choix", m.choices.find((c) => c.key === "skills" && c.source.index === 1).count, 1);
+  }
+  ch.classes[0].level = 2;
+  s = E.compute(ch);
+  eq("Artificier 2 : 4 plans", s.choices.find((c) => c.key === "plans").count, 4);
+  const plan = (id) => DND.lists["artificer-plans"].find((o) => o.id === id);
+  eq("Artificier 2 : Sac sans fond accessible", plan("bag-of-holding").prerequisite(s.context), true);
+  eq("Artificier 2 : plan de niveau 6 bloqué", plan("boots-of-elvenkind").prerequisite(s.context), "Artificier niveau 6");
+  ch.classes[0].level = 7;
+  ch.classes[0].subclass = "battle-smith";
+  s = E.compute(ch);
+  eq("Artificier 7 : emplacements 4/3", s.spellSlots.map((x) => x.max), [4, 3]);
+  eq("Artificier 7 : Éclair de génie = INT", res(s, "artificer.flashOfGenius").max, 3);
+  eq("Artificier 7 : 3 harmonisations", s.attunement.max, 3);
+  ch.classes[0].level = 10;
+  eq("Artificier 10 : Adepte des objets magiques, 4 harmonisations", E.compute(ch).attunement.max, 4);
+  ch.classes[0].level = 7;
+  eq("Forgeron de guerre : arme liée à l'INT", s.weaponBond.ability, "int");
+  eq("Forgeron de guerre : défenseur d'acier", s.companions.map((x) => x.id), ["steel-defender"]);
+  ch.state.companions["steel-defender"] = { form: "steel-defender", damage: 0, custom: {} };
+  s = E.compute(ch);
+  eq("Défenseur d'acier niv. 7, INT +3 : CA 15, PV 40", [s.companions[0].ac, s.companions[0].hpMax], [15, 40]);
+  ch.classes[0].subclass = "armorer";
+  ch.classes[0].choices["sub:armorer/model"] = ["infiltrator"];
+  s = E.compute(ch);
+  eq("Armurier : vitesse 35 pieds (Infiltrateur)", s.speed.walk, 35);
+  ch.classes[0].subclass = "alchemist";
+  s = E.compute(ch);
+  eq("Alchimiste 7 : 3 élixirs", res(s, "artificer.elixirs").max, 3);
+  ch.classes[0].subclass = "artillerist";
+  eq("Artilleur : Canon occulte", !!res(E.compute(ch), "artificer.eldritchCannon"), true);
+  ch.classes[0].level = 10;
+  s = E.compute(ch);
+  eq("Artificier 10 : 6 plans, 3 sorts mineurs", [s.choices.find((c) => c.key === "plans").count, s.casting[0].cantrips], [6, 3]);
+  eq("Sous-classes de l'artificier", E.subclassesOf(DND.modules.class.artificer).map((x) => x.id), ["alchemist", "armorer", "artillerist", "battle-smith", "cartographer"]);
+  {
+    const t = base({ str: 10, dex: 14, con: 14, int: 16, wis: 12, cha: 8 });
+    t.classes = [{ id: "artificer", level: 9, subclass: "cartographer", choices: {} }];
+    let u = E.compute(t);
+    eq("Cartographe 9 : Appel de la foudre préparé", u.spells.some((x) => x.spell.id === "call-lightning" && x.alwaysPrepared), true);
+    eq("Cartographe : Lueurs féeriques gratuites = INT", u.resources.some((r) => r.max === 3 && /faerie-fire/.test(r.id)), true);
+    eq("Cartographe : outils de calligraphe et de cartographe", [!!u.prof["tool.calligraphers-supplies"], !!u.prof["tool.cartographers-tools"]], [true, true]);
+    t.classes[0].subclass = "artillerist";
+    u = E.compute(t);
+    eq("Artilleur : arc long maîtrisé, pas l'épée longue", [!!u.prof["weapon.longbow"], !!u.prof["weapon.longsword"]], [true, false]);
+    t.classes[0].subclass = "armorer";
+    t.classes[0].choices["sub:armorer/model"] = ["dreadnaught"];
+    u = E.compute(t);
+    eq("Cuirassé : Stature de géant = INT", u.resources.find((r) => /giantStature/.test(r.id)).max, 3);
+  }
+  eq("Artificier : pas d'erreur", s.errors, []);
+  eq("Sorts d'artificier au catalogue (liste de Forge of the Artificer)", Object.values(DND.data.spells).filter((x) => x.lists.includes("artificer")).length, 96);
+  // Aptitudes passives de combat dans les Actions spéciales
+  ch = base({ str: 16, dex: 12, con: 14, int: 10, wis: 10, cha: 8 });
+  ch.background = { id: "soldier", choices: {} };
+  ch.classes = [{ id: "fighter", level: 5, subclass: "champion", choices: { fightingStyle: ["dueling"] } }];
+  s = E.compute(ch);
+  const passives = s.actions.filter((a) => a.actionType === "passive").map((a) => a.name.fr);
+  eq("Combat : Duel, Sauvagerie martiale et Attaque supplémentaire en passif", ["Duel", "Sauvagerie martiale", "Attaque supplémentaire"].every((n) => passives.includes(n)), true);
+  eq("Combat : la note d'Attaque supplémentaire ne fait pas doublon", s.notes.some((n) => /Attaque supplémentaire/.test(n.text)), false);
+  ch.classes[0].choices.masteries = ["longsword", "quarterstaff", "longbow"];
+  s = E.compute(ch);
+  const wm = s.actions.find((a) => a.name.fr === "Bottes d'arme").description;
+  eq("Bottes d'arme : une ligne par arme choisie", wm.length, 3);
+  eq("Bottes d'arme : Épée longue = Sape", /^Épée longue \(Sape\)/.test(wm[0]), true);
+  eq("Bottes d'arme : DD du Renversement calculé (8 + FOR 3 + maîtrise 3)", wm[1].includes("DD 14"), true);
+  eq("Guerrier sans sorts (onglet Sorts masqué)", s.casting.length + s.spells.length, 0);
+  eq("Sorts du Xanathar : lien vers la fiche AideDD 2014", DND.config.spellUrl(DND.data.spells.frostbite), "https://www.aidedd.org/dnd/sorts.php?vf=gelure");
+};

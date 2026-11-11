@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fiche de personnage D&amp;D 2024</title>
+  <link rel="stylesheet" href="core/style.css">
+  <!-- Filet de sécurité : garde la trace des erreurs pour les afficher si la fiche ne démarre pas -->
+  <script>
+    window.startErrors = [];
+    window.addEventListener("error", function (e) {
+      var t = e.target;
+      window.startErrors.push(t && t.src ? "fichier introuvable : " + t.src.split("/").slice(-2).join("/") : e.message);
+    }, true);
+  </script>
+</head>
+<body>
+  <div id="app"><p class="loading">Chargement…</p></div>
+  <input type="file" id="import-file" accept=".json,application/json" hidden>
+
+  <!-- Noyau -->
+  <script src="core/registry.js"></script>
+  <script src="data/rules.js"></script>
+  <script src="data/equipment.js"></script>
+  <script src="data/spells.js"></script>
+  <script src="data/spell-upcast.js"></script>
+  <script src="core/engine.js"></script>
+  <script src="core/rules.js"></script>
+  <script src="core/storage.js"></script>
+  <script src="core/dom.js"></script>
+  <script src="core/app.js"></script>
+  <script src="core/view-play.js"></script>
+  <script src="core/view-build.js"></script>
+
+  <!-- Modules : pour ajouter une classe, une espèce, etc., modifier seulement modules/manifest.js -->
+  <script src="modules/manifest.js"></script>
+  <script src="core/loader.js"></script>
+
+  <!-- Si rien n'a démarré (fichiers manquants, page ouverte depuis le ZIP…), on l'explique au lieu de rester sur « Chargement… » -->
+  <script>
+    window.addEventListener("load", function () {
+      setTimeout(function () {
+        if (!document.querySelector("#app .loading")) return;
+        var errs = window.startErrors.slice(0, 5).map(function (x) { return "<li>" + String(x).replace(/</g, "&lt;") + "</li>"; }).join("");
+        document.getElementById("app").innerHTML =
+          '<div style="max-width:640px;margin:2rem auto;padding:1rem 1.2rem;font:15px/1.5 system-ui,sans-serif;background:#e2c9a8;color:#2a1c0f;border:1px solid #b3936a;border-radius:8px">' +
+          '<h2 style="margin-top:0">La fiche n\'a pas pu démarrer</h2>' +
+          '<p>Le plus souvent, la page a été ouverte <b>directement depuis le fichier ZIP</b>. Faites clic droit sur le ZIP, puis « Extraire tout », et ouvrez <b>index.html</b> dans le dossier extrait.</p>' +
+          '<p>Vérifiez aussi que les dossiers <b>core</b>, <b>data</b> et <b>modules</b> sont bien à côté d\'index.html.</p>' +
+          (errs ? '<p>Détail technique :</p><ul>' + errs + '</ul>' : '') + '</div>';
+      }, 1500);
+    });
+  </script>
+</body>
+</html>

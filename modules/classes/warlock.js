@@ -1,0 +1,230 @@
+// Classe : Occultiste (Warlock) — SRD 5.2, niveaux 1 à 10 détaillés.
+// Journal de la classe : classes/occultiste.md
+(function () {
+  const E = DND.engine;
+  const lvl = (c) => c.classLevel("warlock");
+  const minLevel = (n) => Object.assign((c) => lvl(c) >= n || "Occultiste niveau " + n, { level: n });
+  // L'occultiste a-t-il choisi cette manifestation ?
+  const has = (c, id) => c.character.classes.some((e) => e.id === "warlock" && (e.choices.invocations || []).includes(id));
+  const needs = (n, pact, label) => Object.assign((c) => {
+    if (lvl(c) < n) return "Occultiste niveau " + n;
+    if (pact && !has(c, pact)) return label;
+    return true;
+  }, { level: n });
+  const cha = "cha";
+
+  // --- Familiers (Appel de familier + formes spéciales du Pacte de la chaîne) ---
+  // Valeurs par défaut à vérifier dans le livre : le joueur peut les corriger sur la fiche.
+  // CA, PV et vitesses vérifiés sur AideDD le 2026-10-15 ; aidedd = adresse de la fiche si elle diffère du nom
+  const F = (id, fr, en, ac, hp, speed, traits, special, aidedd) => ({ id, name: { fr: fr + (special ? " ★" : ""), en }, ac, hp, speed, traits, aidedd });
+  const FAMILIAR_FORMS = [
+    F("imp", "Diablotin", "Imp", 13, 21, "6 m, vol 12 m", "Dard empoisonné, invisibilité, métamorphose, résistance à la magie.", true),
+    F("pseudodragon", "Pseudodragon", "Pseudodragon", 14, 10, "4,5 m, vol 18 m", "Morsure, dard soporifique, résistance à la magie.", true),
+    F("quasit", "Quasit", "Quasit", 13, 25, "12 m", "Griffes empoisonnées, invisibilité, effroi, métamorphose.", true),
+    F("skeleton", "Squelette", "Skeleton", 14, 13, "9 m", "Épée courte et arc court, vulnérable au contondant.", true),
+    F("slaad-tadpole", "Têtard de slaad", "Slaad Tadpole", 12, 7, "9 m, fouissement 3 m", "Morsure, résistances élémentaires.", true, "slaad-tetard"),
+    F("sphinx-of-wonder", "Sphinx merveilleux", "Sphinx of Wonder", 13, 24, "6 m, vol 12 m", "Griffes, résistance à la magie, détournement de sort.", true),
+    F("sprite", "Esprit follet", "Sprite", 15, 10, "3 m, vol 12 m", "Arc court soporifique, invisibilité, lecture des cœurs.", true),
+    F("venomous-snake", "Serpent venimeux", "Venomous Snake", 12, 5, "9 m, nage 9 m", "Morsure empoisonnée.", true),
+    F("bat", "Chauve-souris", "Bat", 12, 1, "1,5 m, vol 9 m", "Vision aveugle, vol."),
+    F("cat", "Chat", "Cat", 12, 2, "12 m, escalade 12 m", "Odorat aiguisé, griffes."),
+    F("frog", "Grenouille", "Frog", 11, 1, "6 m, nage 6 m", "Amphibie, saut sans élan."),
+    F("hawk", "Faucon", "Hawk", 13, 1, "3 m, vol 18 m", "Vue aiguisée, serres."),
+    F("lizard", "Lézard", "Lizard", 10, 2, "6 m, escalade 6 m", "Pattes d'araignée."),
+    F("octopus", "Pieuvre", "Octopus", 12, 3, "1,5 m, nage 9 m", "Nuage d'encre, camouflage."),
+    F("owl", "Chouette", "Owl", 11, 1, "1,5 m, vol 18 m", "Vol sans attaque d'opportunité, vision dans le noir."),
+    F("rat", "Rat", "Rat", 10, 1, "6 m, escalade 6 m", "Odorat aiguisé, morsure."),
+    F("raven", "Corbeau", "Raven", 12, 2, "3 m, vol 15 m", "Imitation des sons."),
+    F("spider", "Araignée", "Spider", 12, 1, "6 m, escalade 6 m", "Pattes d'araignée, sens de la toile."),
+    F("weasel", "Belette", "Weasel", 13, 1, "9 m, escalade 9 m", "Odorat aiguisé."),
+  ];
+
+  const marker = { type: "marker" }; // choix purement informatif (pas d'effet calculé)
+  const cantripChoice = (label) => ({ type: "choice", id: "cantrip", label, from: "spells",
+    filter: { level: 0, list: "warlock", damaging: true }, grant: marker });
+
+  // --- Manifestations occultes (Eldritch Invocations) ---
+  registerList("warlock-invocations", [
+    { id: "pact-of-the-blade", name: { fr: "Pacte de la lame", en: "Pact of the Blade" },
+      description: "Action bonus : créer une arme de pacte ou lier une arme magique. Vous la maîtrisez et pouvez utiliser le Charisme pour l'attaque et les dégâts. Sur la fiche : cochez « Pacte » sur l'arme liée dans l'Inventaire.",
+      effects: [
+        { type: "weaponBond", ability: cha, label: "Arme de pacte" },
+        { type: "note", text: "Arme de pacte : attaque et dégâts avec le Charisme ; dégâts nécrotiques, psychiques, radiants ou du type normal de l'arme, au choix." },
+      ] },
+    { id: "pact-of-the-chain", name: { fr: "Pacte de la chaîne", en: "Pact of the Chain" },
+      description: "Appel de familier sans emplacement, avec des formes spéciales. Vous pouvez renoncer à une attaque pour que le familier attaque avec sa réaction.",
+      effects: [
+        { type: "spell", spell: "find-familiar", ability: cha, atWill: true },
+        { type: "companion", id: "familiar", name: { fr: "Familier", en: "Familiar" }, forms: FAMILIAR_FORMS,
+          description: "Les formes marquées ★ sont réservées au Pacte de la chaîne. Lors de l'action Attaque, vous pouvez renoncer à une de vos attaques pour que le familier attaque avec sa réaction." },
+      ] },
+    { id: "pact-of-the-tome", name: { fr: "Pacte du grimoire", en: "Pact of the Tome" },
+      description: "Livre des ombres : trois tours de magie et deux rituels de niveau 1 de n'importe quelle liste, toujours préparés.",
+      effects: [
+        { type: "choice", id: "cantrips", label: "Tours de magie du Livre des ombres", count: 3, from: "spells", filter: { level: 0 },
+          grant: { type: "spell", spell: "{value}", ability: cha } },
+        { type: "choice", id: "rituals", label: "Rituels de niveau 1 du Livre des ombres", count: 2, from: "spells", filter: { level: 1, ritual: true },
+          grant: { type: "spell", spell: "{value}", ability: cha } },
+      ] },
+    { id: "agonizing-blast", combat: true, name: { fr: "Décharge déchirante", en: "Agonizing Blast" },
+      description: "Ajoutez votre modificateur de Charisme aux dégâts d'un tour de magie d'occultiste qui inflige des dégâts.",
+      prerequisite: minLevel(2),
+      effects: [{ type: "choice", id: "cantrip", label: "Tour de magie amélioré", from: "spells",
+        filter: { level: 0, list: "warlock", damaging: true },
+        grant: { type: "bonus", target: "spellDamage.{value}", value: (c) => c.mod.cha, label: "Décharge déchirante" } }] },
+    { id: "armor-of-shadows", name: { fr: "Armure des ombres", en: "Armor of Shadows" },
+      description: "Armure de mage sur vous-même, sans emplacement de sort.",
+      effects: [
+        { type: "spell", spell: "mage-armor", ability: cha, atWill: true },
+        { type: "acFormula", label: "Armure de mage", base: 13, abilities: ["dex"] },
+      ] },
+    { id: "ascendant-step", name: { fr: "Pas ascendant", en: "Ascendant Step" },
+      description: "Lévitation sur vous-même, sans emplacement de sort.", prerequisite: minLevel(5),
+      effects: [{ type: "spell", spell: "levitate", ability: cha, atWill: true }] },
+    { id: "devils-sight", name: { fr: "Vision du diable", en: "Devil's Sight" },
+      description: "Vous voyez normalement dans les ténèbres magiques ou non, à 36 m.", prerequisite: minLevel(2),
+      effects: [{ type: "sense", sense: "devils-sight", range: 120 }] },
+    { id: "eldritch-mind", name: { fr: "Esprit occulte", en: "Eldritch Mind" },
+      description: "Avantage aux jets de sauvegarde de Constitution pour maintenir la concentration.",
+      effects: [{ type: "note", text: "Avantage aux JS de Constitution pour maintenir la concentration." }] },
+    { id: "eldritch-smite", combat: true, name: { fr: "Châtiment occulte", en: "Eldritch Smite" },
+      description: "Quand vous touchez avec l'arme de pacte, dépensez un emplacement de Magie de pacte : +1d8 force, +1d8 par niveau d'emplacement, et la cible peut tomber À terre.",
+      prerequisite: needs(5, "pact-of-the-blade", "Pacte de la lame"),
+      effects: [{ type: "action", name: { fr: "Châtiment occulte", en: "Eldritch Smite" }, actionType: "free",
+        description: (c) => { const p = DND.byLevel({ 1: 1, 3: 2, 5: 3, 7: 4, 9: 5 }, lvl(c));
+          return "Une fois par tour, en touchant avec l'arme de pacte : dépensez un emplacement de pacte pour +" + (1 + p) + "d8 dégâts de force ; la cible (Énorme ou plus petite) tombe À terre si vous le voulez."; } }] },
+    { id: "eldritch-spear", combat: true, name: { fr: "Lance occulte", en: "Eldritch Spear" },
+      description: "La portée d'un tour de magie d'occultiste à dégâts augmente de 9 m par niveau d'occultiste.", prerequisite: minLevel(2),
+      effects: [cantripChoice("Tour de magie concerné"),
+        { type: "note", text: (c) => "Portée du tour de magie choisi augmentée de " + E.meters(30 * lvl(c)) + "." }] },
+    { id: "fiendish-vigor", name: { fr: "Vigueur fiélonne", en: "Fiendish Vigor" },
+      description: "Simulacre de vie sur vous-même sans emplacement ; vous obtenez le maximum de PV temporaires.", prerequisite: minLevel(2),
+      effects: [{ type: "spell", spell: "false-life", ability: cha, atWill: true }] },
+    { id: "gaze-of-two-minds", name: { fr: "Regard des deux esprits", en: "Gaze of Two Minds" },
+      description: "Action bonus : lien télépathique avec une créature consentante ; vous percevez par ses sens et pouvez lancer des sorts depuis son espace.",
+      prerequisite: minLevel(5) },
+    { id: "gift-of-the-depths", name: { fr: "Don des profondeurs", en: "Gift of the Depths" },
+      description: "Respiration sous l'eau, vitesse de nage égale à votre vitesse, Respiration aquatique une fois sans emplacement (repos long).",
+      prerequisite: minLevel(5),
+      effects: [{ type: "speed", mode: "swim", value: "walk" },
+        { type: "spell", spell: "water-breathing", ability: cha, freeCast: { max: 1, recharge: "long" } }] },
+    { id: "investment-of-the-chain-master", name: { fr: "Investiture du maître de la chaîne", en: "Investment of the Chain Master" },
+      description: "Votre familier gagne vol ou nage 12 m, attaque avec une action bonus de votre part, utilise votre DD de sorts et peut obtenir la résistance par votre réaction.",
+      prerequisite: needs(5, "pact-of-the-chain", "Pacte de la chaîne"),
+      effects: [{ type: "companionNote", companion: "familiar",
+        text: (c) => "Investiture : vitesse de vol ou de nage 12 m ; action bonus pour qu'il attaque ; dégâts nécrotiques ou radiants au choix ; ses JS imposés utilisent votre DD (" + (8 + c.pb + c.mod.cha) + ") ; réaction : résistance aux dégâts qu'il subit." }] },
+    { id: "lessons-of-the-first-ones", name: { fr: "Leçons des Premiers", en: "Lessons of the First Ones" },
+      description: "Vous gagnez un don d'origine.", prerequisite: minLevel(2),
+      effects: [{ type: "choice", id: "feat", label: "Don d'origine", from: "feats", filter: { category: "origin" } }] },
+    { id: "lifedrinker", combat: true, name: { fr: "Buveur de vie", en: "Lifedrinker" },
+      description: "Une fois par tour, en touchant avec l'arme de pacte : +1d6 nécrotiques, psychiques ou radiants, et vous pouvez dépenser un dé de vie pour vous soigner.",
+      prerequisite: needs(9, "pact-of-the-blade", "Pacte de la lame"),
+      effects: [{ type: "note", text: (c) => "Buveur de vie : +1d6 dégâts avec l'arme de pacte ; dépenser un dé de vie rend 1d8 + " + c.mod.con + " PV." }] },
+    { id: "mask-of-many-faces", name: { fr: "Masque aux mille visages", en: "Mask of Many Faces" },
+      description: "Déguisement sans emplacement de sort.", prerequisite: minLevel(2),
+      effects: [{ type: "spell", spell: "disguise-self", ability: cha, atWill: true }] },
+    { id: "master-of-myriad-forms", name: { fr: "Maître des formes multiples", en: "Master of Myriad Forms" },
+      description: "Modification d'apparence sans emplacement de sort.", prerequisite: minLevel(5),
+      effects: [{ type: "spell", spell: "alter-self", ability: cha, atWill: true }] },
+    { id: "misty-visions", name: { fr: "Visions brumeuses", en: "Misty Visions" },
+      description: "Image silencieuse sans emplacement de sort.", prerequisite: minLevel(2),
+      effects: [{ type: "spell", spell: "silent-image", ability: cha, atWill: true }] },
+    { id: "one-with-shadows", name: { fr: "Uni aux ombres", en: "One with Shadows" },
+      description: "Dans une zone de lumière faible ou de ténèbres, Invisibilité sur vous-même sans emplacement.", prerequisite: minLevel(5),
+      effects: [{ type: "spell", spell: "invisibility", ability: cha, atWill: true }] },
+    { id: "otherworldly-leap", name: { fr: "Bond d'outre-monde", en: "Otherworldly Leap" },
+      description: "Saut sur vous-même sans emplacement de sort.", prerequisite: minLevel(2),
+      effects: [{ type: "spell", spell: "jump", ability: cha, atWill: true }] },
+    { id: "repelling-blast", combat: true, name: { fr: "Décharge repoussante", en: "Repelling Blast" },
+      description: "Quand un tour de magie d'occultiste à jet d'attaque touche une créature Grande ou plus petite, vous pouvez la repousser de 3 m.",
+      prerequisite: minLevel(2),
+      effects: [cantripChoice("Tour de magie concerné"), { type: "note", text: "Décharge repoussante : repousser la cible de 3 m quand le tour de magie choisi touche." }] },
+    { id: "thirsting-blade", combat: true, name: { fr: "Lame assoiffée", en: "Thirsting Blade" },
+      description: "Vous attaquez deux fois avec l'arme de pacte lors de l'action Attaque.",
+      prerequisite: needs(5, "pact-of-the-blade", "Pacte de la lame"),
+      effects: [{ type: "note", text: "Lame assoiffée : deux attaques avec l'arme de pacte par action Attaque." }] },
+    { id: "visions-of-distant-realms", name: { fr: "Visions des royaumes lointains", en: "Visions of Distant Realms" },
+      description: "Oeil du mage sans emplacement de sort.", prerequisite: minLevel(9),
+      effects: [{ type: "spell", spell: "arcane-eye", ability: cha, atWill: true }] },
+    { id: "whispers-of-the-grave", name: { fr: "Murmures d'outre-tombe", en: "Whispers of the Grave" },
+      description: "Communication avec les morts sans emplacement de sort.", prerequisite: minLevel(7),
+      effects: [{ type: "spell", spell: "speak-with-dead", ability: cha, atWill: true }] },
+    { id: "gift-of-the-protectors", name: { fr: "Don des protecteurs", en: "Gift of the Protectors" },
+      description: "Une page de votre Livre des ombres : une créature qui y a écrit son nom et tombe à 0 PV tombe à 1 PV à la place (une fois par repos long).",
+      prerequisite: needs(9, "pact-of-the-tome", "Pacte du grimoire") },
+  ]);
+
+  registerModule({
+    kind: "class", id: "warlock",
+    name: { fr: "Occultiste", en: "Warlock" },
+    color: "#6b3fa0", // couleur d'accent de la fiche (modifiable dans Options)
+    hitDie: 8,
+    savingThrows: ["wis", "cha"],
+    subclassLevel: 3,
+    multiclassRequirement: [["cha"]],
+    proficiencies: { armor: ["light"], weapons: ["simple"],
+      skills: { choose: 2, from: ["arcana", "deception", "history", "intimidation", "investigation", "nature", "religion"] } },
+    multiclassProficiencies: { armor: ["light"] },
+    spellcasting: {
+      progression: "pact", ability: cha, list: "warlock",
+      cantrips: { 1: 2, 4: 3, 10: 4 },
+      prepared: { 1: 2, 2: 3, 3: 4, 4: 5, 5: 6, 6: 7, 7: 8, 8: 9, 9: 10, 11: 11, 13: 12, 15: 13, 17: 14, 19: 15 },
+      pactSlots: { 1: { count: 1, level: 1 }, 2: { count: 2, level: 1 }, 3: { count: 2, level: 2 }, 5: { count: 2, level: 3 },
+        7: { count: 2, level: 4 }, 9: { count: 2, level: 5 }, 11: { count: 3, level: 5 }, 17: { count: 4, level: 5 } },
+    },
+    features: [
+      { level: 1, id: "eldritch-invocations", name: { fr: "Manifestations occultes", en: "Eldritch Invocations" },
+        description: "Des fragments de savoir interdit. Les pactes (lame, chaîne, grimoire) sont des manifestations. À chaque niveau d'occultiste, vous pouvez en remplacer une.",
+        effects: [{ type: "choice", id: "invocations", label: "Manifestations occultes", from: "list:warlock-invocations", showChosen: true,
+          count: { 1: 1, 2: 3, 5: 5, 7: 6, 9: 7, 12: 8, 15: 9, 18: 10 } }] },
+      { level: 1, id: "pact-magic", name: { fr: "Magie de pacte", en: "Pact Magic" },
+        description: "Incantation basée sur le Charisme. Tous vos emplacements sont du même niveau et se récupèrent au repos court ou long. Vous pouvez changer un tour de magie et un sort préparé à chaque niveau." },
+      { level: 2, id: "magical-cunning", name: { fr: "Rouerie magique", en: "Magical Cunning" },
+        description: "Rite d'une minute : récupérez des emplacements de Magie de pacte dépensés, jusqu'à la moitié de votre maximum (arrondi au supérieur). Une fois par repos long.",
+        effects: [{ type: "resource", id: "magicalCunning", name: { fr: "Rouerie magique", en: "Magical Cunning" }, max: 1, recharge: "long",
+          description: "Rite d'une minute : récupérer la moitié des emplacements de pacte (arrondi au supérieur)." }] },
+      { level: 3, id: "subclass", name: { fr: "Sous-classe d'occultiste", en: "Warlock Subclass" },
+        description: "Choisissez votre protecteur dans la partie Création." },
+      { level: 4, id: "asi-4", name: { fr: "Amélioration de caractéristique", en: "Ability Score Improvement" },
+        description: "Le don Amélioration de caractéristique ou un autre don dont vous remplissez les conditions.",
+        effects: [{ type: "choice", id: "feat4", label: "Don du niveau 4", from: "feats", filter: { category: ["general", "origin"] } }] },
+      { level: 8, id: "asi-8", name: { fr: "Amélioration de caractéristique", en: "Ability Score Improvement" },
+        description: "Le don Amélioration de caractéristique ou un autre don dont vous remplissez les conditions.",
+        effects: [{ type: "choice", id: "feat8", label: "Don du niveau 8", from: "feats", filter: { category: ["general", "origin"] } }] },
+      { level: 9, id: "contact-patron", name: { fr: "Communication avec le protecteur", en: "Contact Patron" },
+        description: "Contact avec les plans toujours préparé ; une fois par repos long, vous le lancez sans emplacement pour joindre votre protecteur et réussissez automatiquement le jet de sauvegarde.",
+        effects: [{ type: "spell", spell: "contact-other-plane", ability: cha, freeCast: { max: 1, recharge: "long" } }] },
+      { level: 11, id: "mystic-arcanum", name: { fr: "Arcanum mystique", en: "Mystic Arcanum" },
+        description: "Non géré pour l'instant (au-delà du niveau 10)." },
+    ],
+    subclasses: [
+      {
+        id: "fiend", name: { fr: "Protecteur fiélon", en: "Fiend Patron" },
+        features: [
+          { level: 3, id: "fiend-spells", name: { fr: "Sorts du Fiélon", en: "Fiend Spells" },
+            description: "Sorts toujours préparés : Mains brûlantes, Injonction, Rayon ardent, Suggestion (niv. 3) ; Boule de feu, Nuage nauséabond (niv. 5) ; Bouclier de feu, Mur de feu (niv. 7) ; Quête, Fléau d'insectes (niv. 9).",
+            effects: [
+              ...["burning-hands", "command", "scorching-ray", "suggestion"].map((spell) => ({ type: "spell", spell, ability: cha })),
+              ...["fireball", "stinking-cloud"].map((spell) => ({ type: "spell", spell, ability: cha, minLevel: 5 })),
+              ...["fire-shield", "wall-of-fire"].map((spell) => ({ type: "spell", spell, ability: cha, minLevel: 7 })),
+              ...["geas", "insect-plague"].map((spell) => ({ type: "spell", spell, ability: cha, minLevel: 9 })),
+            ] },
+          { level: 3, id: "dark-ones-blessing", combat: true, name: { fr: "Bénédiction du Ténébreux", en: "Dark One's Blessing" },
+            description: (c, l) => "Quand vous faites tomber un ennemi à 0 PV (ou qu'un autre le fait à 3 m de vous), vous gagnez " +
+              Math.max(1, c.mod.cha + l) + " PV temporaires (Charisme + niveau d'occultiste).",
+            effects: [{ type: "note", text: (c, l) => "Ennemi à 0 PV : " + Math.max(1, c.mod.cha + l) + " PV temporaires." }] },
+          { level: 6, id: "dark-ones-own-luck", name: { fr: "Chance du Ténébreux", en: "Dark One's Own Luck" },
+            description: "Après avoir vu le résultat d'un test de caractéristique ou d'un jet de sauvegarde, ajoutez 1d10 (une fois par jet). Utilisations égales au modificateur de Charisme (minimum 1), récupérées au repos long.",
+            effects: [{ type: "resource", id: "darkLuck", name: { fr: "Chance du Ténébreux", en: "Dark One's Own Luck" },
+              max: (c) => Math.max(1, c.mod.cha), recharge: "long", description: "+1d10 à un test de caractéristique ou un JS." }] },
+          { level: 10, id: "fiendish-resilience", name: { fr: "Résistance fiélonne", en: "Fiendish Resilience" },
+            description: "À la fin de chaque repos court ou long, choisissez un type de dégâts autre que force : vous y êtes résistant jusqu'au prochain choix.",
+            effects: [{ type: "choice", id: "resilience", label: "Résistance fiélonne (à changer après chaque repos)",
+              from: "damageTypes", filter: { except: ["force"] }, grant: { type: "resistance", damage: "{value}" } }] },
+          { level: 14, id: "hurl-through-hell", name: { fr: "Traversée des enfers", en: "Hurl Through Hell" },
+            description: "Non géré pour l'instant (au-delà du niveau 10)." },
+        ],
+      },
+    ],
+  });
+})();

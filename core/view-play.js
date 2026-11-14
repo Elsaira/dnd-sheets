@@ -267,7 +267,10 @@
       h("table", { class: "attacks" },
         h("thead", null, h("tr", null, h("th", null, "Nom"), h("th", null, "Attaque"), h("th", null, "Dégâts"), h("th", null, "Portée"))),
         h("tbody", null, s.attacks.map((a) => h("tr", { class: a.kind === "weapon" && !a.equipped ? "dim" : "" },
-          h("td", { title: [en(a.nameEn), a.props.join(", ")].filter(Boolean).join(" · ") }, a.name,
+          h("td", { title: [en(a.nameEn), a.props.join(", ")].filter(Boolean).join(" · ") },
+            a.kind === "spell" && a.spell && !a.spell.custom
+              ? h("a", { href: DND.config.spellUrl(a.spell), target: "_blank", rel: "noopener", title: "EN : " + a.spell.name.en + " · description complète sur AideDD" }, a.name)
+              : a.name,
             a.mastery ? h("span", { class: "tag", title: a.mastery.summary }, a.mastery.fr) : null,
             a.kind === "weapon" && !a.proficient ? h("span", { class: "tag warn", title: "Arme non maîtrisée" }, "non maîtrisée") : null,
             a.bond ? h("span", { class: "tag", title: a.bond }, s.weaponBond ? s.weaponBond.column : "Pacte") : null,

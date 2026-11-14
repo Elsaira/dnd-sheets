@@ -119,26 +119,20 @@
   R.useResource = function (ch, sheet, id, delta) {
     const r = sheet.resources.find((x) => x.id === id);
     if (!r) return;
-    if (id === "cleric.keeperOfSouls" && delta > 0 && ch.state.conditions.includes("incapacitated"))
-      return "Vous ne pouvez pas utiliser Gardien des âmes en étant Neutralisé.";
-    if (id === "cleric.keeperOfSouls" && delta < 0)
-      return "Récupérez Gardien des âmes après un repos ou en dépensant un emplacement de niveau 6 ou supérieur.";
+    if (delta > 0 && r.blockedBy && ch.state.conditions.includes(r.blockedBy))
+      return r.name.fr + " : impossible en étant " + DND.label("condition." + r.blockedBy) + ".";
     ch.state.resources[id] = Math.min(r.max, Math.max(0, (ch.state.resources[id] || 0) + delta));
   };
 
-  R.restoreKeeperOfSouls = function (ch, sheet, level) {
-    const id = "cleric.keeperOfSouls";
-    const resource = sheet.resources.find((x) => x.id === id);
-    const slot = sheet.spellSlots.find((x) => x.level === Number(level));
-    const spent = ch.state.resources[id] || 0;
-    if (!resource) return "Gardien des âmes n'est pas disponible.";
-    if (ch.state.conditions.includes("incapacitated")) return "Vous ne pouvez pas utiliser Gardien des âmes en étant Neutralisé.";
-    if (spent < 1) return "Aucune utilisation de Gardien des âmes à récupérer.";
-    if (!slot || slot.level < 6 || (ch.state.slotsSpent[slot.level] || 0) >= slot.max)
-      return "Un emplacement de sort disponible de niveau 6 ou supérieur est requis.";
-    ch.state.slotsSpent[slot.level] = (ch.state.slotsSpent[slot.level] || 0) + 1;
-    ch.state.resources[id] = spent - 1;
-    return "Gardien des âmes récupéré : emplacement de niveau " + slot.level + " dépensé.";
+  R.regainWithSlot = function (ch, sheet, id, level) {
+    const r = sheet.resources.find((x) => x.id === id);
+    const slot = sheet.spellSlots.find((x) => x.level === level);
+    if (!r || !r.slotRegain || r.spent < 1) return;
+    if (r.blockedBy && ch.state.conditions.includes(r.blockedBy)) return r.name.fr + " : impossible en étant " + DND.label("condition." + r.blockedBy) + ".";
+    if (!slot || level < r.slotRegain || slot.spent >= slot.max) return "Aucun emplacement de niveau " + r.slotRegain + " ou plus disponible.";
+    ch.state.slotsSpent[level] = slot.spent + 1;
+    ch.state.resources[id] = r.spent - 1;
+    return r.name.fr + " récupéré : emplacement de niveau " + level + " dépensé.";
   };
 
   R.useSlot = function (ch, sheet, level, delta) {

@@ -290,7 +290,7 @@
   ]);
   const isHealingSpell = (sp) => HEALING_SPELLS.has(sp.spell.id) || /soin|guérison|heal|cure/i.test(sp.spell.name.fr + " " + (sp.spell.name.en || ""));
   function supportSpellsCard(s) {
-    return spellListCard(s, "Sorts de supports", s.spells.filter((sp) => !sp.spell.damage && !sp.spell.attack && !isHealingSpell(sp)), "support-spells-card");
+    return spellListCard(s, "Sorts de soutien", s.spells.filter((sp) => !sp.spell.damage && !sp.spell.attack && !isHealingSpell(sp)), "support-spells-card");
   }
 
   function healingSpellsCard(s) {
@@ -338,19 +338,18 @@
       })));
   }
 
-  function pips(count, spent, action, data, canRecover) {
-    if (canRecover == null) canRecover = true;
+  function pips(count, spent, action, data) {
     if (count > 12) {
       return h("span", { class: "counter" },
         h("button", { class: "small", "data-action": action, "data-delta": 1, ...data }, "−"),
         h("b", null, " " + (count - spent) + " / " + count + " "),
-        h("button", { class: "small", "data-action": action, "data-delta": -1, disabled: !canRecover, title: canRecover ? "Récupérer" : "Récupération par repos ou emplacement niv. 6+ uniquement", ...data }, "+"));
+        h("button", { class: "small", "data-action": action, "data-delta": -1, ...data }, "+"));
     }
     const out = [];
     for (let i = 0; i < count; i++) {
       const available = i < count - spent;
       out.push(h("button", { class: ["pip", available && "full"], "data-action": action, "data-delta": available ? 1 : -1, ...data,
-        disabled: !available && !canRecover, title: available ? "Dépenser" : canRecover ? "Récupérer" : "Récupération par repos ou emplacement niv. 6+ uniquement" }));
+        title: available ? "Dépenser" : "Récupérer" }));
     }
     return h("span", { class: "pips" }, out);
   }
@@ -359,19 +358,18 @@
   // Ressource rattachée à un compagnon (effet resource avec companion) : affichée sur sa carte
   const onCompanion = (s, r) => r.companion && s.companions.some((cp) => cp.id === r.companion);
   function resourceRow(r) {
-    const isKeeper = r.id === "cleric.keeperOfSouls";
-    const slots = isKeeper && r.spent > 0 ? DND.app.sheet.spellSlots.filter((sl) => sl.level >= 6 && sl.spent < sl.max) : [];
-    const incapacitated = DND.app.ch.state.conditions.includes("incapacitated");
     const row = h("div", { class: "resource", title: (r.description || "") + (r.name.en ? " (EN : " + r.name.en + ")" : "") },
       h("div", { class: "res-name" }, r.name.fr, h("small", { class: "muted" },
-        " · " + (isKeeper ? "repos court ou long" : RECHARGE[r.recharge]) + (r.shortRegain ? " (" + r.shortRegain + " au repos court)" : ""))),
-      pips(r.max, r.spent, "resource", { "data-id": r.id }, !isKeeper));
-    if (!isKeeper || r.spent < 1) return row;
-    const recovery = h("div", { class: "grave-recovery small-text" }, "Récupérer sans action avec un emplacement : ",
-        slots.length ? slots.map((sl) => h("button", { class: "small", "data-action": "restoreKeeperOfSouls", "data-level": sl.level,
-          disabled: incapacitated, title: incapacitated ? "Impossible en étant Neutralisé" : "Dépenser un emplacement de niveau " + sl.level }, "Niv. " + sl.level))
-          : h("span", { class: "muted" }, "aucun emplacement de niveau 6+ disponible"));
-    return h("div", { class: "resource-stack" }, row, recovery);
+        " · " + RECHARGE[r.recharge] + (r.shortRegain ? " (" + r.shortRegain + " au repos court)" : ""))),
+      pips(r.max, r.spent, "resource", { "data-id": r.id }));
+    if (!r.slotRegain || r.spent < 1) return row;
+    const slots = DND.app.sheet.spellSlots.filter((sl) => sl.level >= r.slotRegain && sl.spent < sl.max);
+    const blocked = r.blockedBy && DND.app.ch.state.conditions.includes(r.blockedBy);
+    return h("div", { class: "resource-stack" }, row,
+      h("div", { class: "slot-regain small-text" }, "Récupérer avec un emplacement : ",
+        slots.length ? slots.map((sl) => h("button", { class: "small", "data-action": "regainWithSlot", "data-id": r.id, "data-level": sl.level,
+          disabled: blocked, title: blocked ? "Impossible en étant " + DND.label("condition." + r.blockedBy) : "Dépenser un emplacement de niveau " + sl.level }, "Niv. " + sl.level))
+          : h("span", { class: "muted" }, "aucun emplacement de niveau " + r.slotRegain + "+ disponible")));
   }
   function resourcesCard(s) {
     const list = s.resources.filter((r) => !onCompanion(s, r));
@@ -683,7 +681,7 @@
   }
 
   Object.assign(DND.app.actions, {
-    restoreKeeperOfSouls: (d) => DND.app.update((ch, s) => R.restoreKeeperOfSouls(ch, s, Number(d.level))),
+    regainWithSlot: (d) => DND.app.update((ch, s) => R.regainWithSlot(ch, s, d.id, Number(d.level))),
     damage: () => { const v = DND.app.ui.amount; DND.app.ui.amount = ""; DND.app.update((ch, s) => R.damage(ch, s, v)); },
     heal: () => { const v = DND.app.ui.amount; DND.app.ui.amount = ""; DND.app.update((ch, s) => R.heal(ch, s, v)); },
     spendCoins: () => coinAction(R.spendCoins),

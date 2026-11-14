@@ -625,8 +625,9 @@
           const one = spell.damage.dice + (extra ? E.signed(extra) : "");
           out.damage = (beams > 1 ? beams + " rayons de " : "") + one + type;
         } else {
-          const dice = spell.scaling === "cantrip" ? cantripDice(spell.damage.dice) : up && up.dice ? E.addDice(spell.damage.dice, up.dice) : spell.damage.dice;
-          out.damage = dice + (extra ? E.signed(extra) : "") + type;
+          const scale = (d) => (spell.scaling === "cantrip" ? cantripDice(d) : up && up.dice ? E.addDice(d, up.dice) : d) + (extra ? E.signed(extra) : "");
+          out.damage = scale(spell.damage.dice) + type;
+          if (spell.damage.alt) out.damageAlt = scale(spell.damage.alt.dice) + " " + spell.damage.alt.label;
         }
       }
       return out;
@@ -791,7 +792,7 @@
       attacks.push({
         kind: "weapon", index, name: item.name || w.name.fr, nameEn: w.name.en, ability, proficient, toHit,
         damage: fmt(dice) + " " + DND.label(w.damageType).toLowerCase(),
-        versatile: w.versatile && avg(w.versatile) > avg(dice) ? fmt(w.versatile) : null,
+        alt: w.versatile && avg(w.versatile) > avg(dice) ? fmt(w.versatile) + " à 2 mains" : null,
         range: w.range ? E.meters(w.range[0]) + "/" + E.meters(w.range[1]) : props.includes("reach") ? E.meters(10) : E.meters(5),
         props: props.map((p) => DND.label("prop." + p)),
         mastery: w.mastery && prof["mastery." + w.id] ? DND.data.masteries[w.mastery] : null,
@@ -816,7 +817,7 @@
     for (const s of sheet.spells) {
       if (s.spell.damage && (s.spell.attack || s.spell.save)) {
         attacks.push({ kind: "spell", spell: s.spell, name: s.spell.name.fr, nameEn: s.spell.name.en, toHit: s.spell.attack ? s.attack : null,
-          save: s.spell.save ? { ability: s.spell.save, dc: s.dc } : null, damage: s.damage,
+          save: s.spell.save ? { ability: s.spell.save, dc: s.dc } : null, damage: s.damage, alt: s.damageAlt,
           range: E.range(s.spell.range), props: [] });
       }
     }

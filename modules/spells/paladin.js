@@ -13,7 +13,7 @@
     S("thunderous-smite", "Châtiment de tonnerre", "Thunderous Smite", 1, "evocation", "bonus", "self", "V", "Instantanée",
       ["paladin"], { save: "str", damage: { dice: "2d6", type: "thunder" } }),
     S("divine-smite", "Châtiment divin", "Divine Smite", 1, "evocation", "bonus", "self", "V", "Instantanée",
-      ["paladin"], { damage: { dice: "2d8", type: "radiant" }, notes: "+1d8 contre un fiélon ou un mort-vivant ; +1d8 par niveau d'emplacement supérieur." }),
+      ["paladin"], { damage: { dice: "2d8", type: "radiant", alt: { dice: "3d8", label: "contre fiélon ou mort-vivant" } }, notes: "+1d8 par niveau d'emplacement supérieur." }),
     S("compelled-duel", "Duel forcé", "Compelled Duel", 1, "enchantment", "bonus", 30, "V", "1 minute",
       ["paladin"], { concentration: true, save: "wis" }),
     S("divine-favor", "Faveur divine", "Divine Favor", 1, "transmutation", "bonus", "self", "V, S", "1 minute",

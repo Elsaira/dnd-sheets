@@ -39,6 +39,7 @@ Check before committing: `grep -n -i "cleric\|warlock\|fighter\|paladin\|sorcere
 - **New spell:** add it in `modules/spells/<x>.js` with `DND.registerSpells`, not in `data/spells.js`. Spell links go to `aidedd.org/spell/fr/<french-name-without-accents-with-dashes>`.
 - **Features** declare `effects`. Existing effect types: `ability`, `acFormula`, `action`, `advantage`, `bonus`, `choice`, `companion`, `companionNote`, `extraSlots`, `extraSpellList`, `immunity`, `note`, `onRest`, `proficiency`, `resistance`, `resource`, `sense`, `size`, `speed`, `spell`, `weaponBond`. Read a similar existing module before inventing anything.
 - **Healing spells** carry `heal: { dice, mod: true }` or `heal: { text }` on the spell; the engine computes the value and the "Soins" card lists them.
+- **Alternative spell damage** (Toll the Dead 1d12 if wounded): `damage: { dice, type, alt: { dice, label } }`; scaled like the main dice and shown in small grey text, like a versatile weapon.
 - **In-play reminders:** a feature that matters in combat takes `combat: true` (or a short string, or a function) so it shows in "Actions spéciales". Write what the player needs at the table, not data-entry instructions.
 - **Saved characters hold only choices and state**, never computed values. Everything else is recomputed on each render. Do not store derived numbers, and keep old saves loading (new state fields must tolerate being absent).
 

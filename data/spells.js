@@ -75,8 +75,7 @@ DND.registerSpells([
   S("thunderclap", "Coup de tonnerre", "Thunderclap", 0, "evocation", "action", "self", "S", "Instantanée",
     ["bard", "druid", "sorcerer", "warlock", "wizard"], { save: "con", damage: { dice: "1d6", type: "thunder" }, scaling: "cantrip" }),
   S("toll-the-dead", "Glas", "Toll the Dead", 0, "necromancy", "action", 60, "V, S", "Instantanée",
-    ["cleric", "warlock", "wizard"], { save: "wis", damage: { dice: "1d8", type: "necrotic" }, scaling: "cantrip",
-      notes: "1d12 si la cible a perdu des PV." }),
+    ["cleric", "warlock", "wizard"], { save: "wis", damage: { dice: "1d8", type: "necrotic", alt: { dice: "1d12", label: "si blessée" } }, scaling: "cantrip" }),
   S("true-strike", "Coup au but", "True Strike", 0, "divination", "action", "self", "S, M", "Instantanée",
     ["bard", "sorcerer", "warlock", "wizard"], { notes: "Attaque avec une arme en utilisant votre caractéristique d'incantation ; +1d6 radiant au niveau 5 (2d6 au 11, 3d6 au 17)." }),
 

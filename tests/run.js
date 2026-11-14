@@ -42,6 +42,7 @@ eq("Initiative avec Vigilant", s.initiative.bonus, 3);
 eq("Second souffle max", s.resources.find((r) => r.id === "test-fighter.secondWind").max, 2);
 eq("Attaque épée longue", s.attacks[0].toHit, 5);
 eq("Dégâts épée longue", s.attacks[0].damage, "1d8+3 tranchant");
+eq("Épée longue à 2 mains", s.attacks[0].alt, "1d10+3 à 2 mains");
 eq("Langue commune", s.proficiencies.languages.includes("language.common"), true);
 eq("Choix restants (langues)", s.pendingChoices, 1);
 eq("Pas d'erreur", s.errors, []);

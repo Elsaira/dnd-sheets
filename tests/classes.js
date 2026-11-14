@@ -63,8 +63,9 @@ module.exports = function (DND, eq) {
   ch = base({ str: 10, dex: 12, con: 14, int: 10, wis: 16, cha: 13 });
   ch.classes = [{ id: "cleric", level: 1, subclass: "", choices: { skills: ["skill.medicine", "skill.religion"], divineOrder: ["thaumaturge"],
     "divineOrder/thaumaturge/cantrip": ["guidance"] } }];
-  ch.spells = [{ id: "sacred-flame", source: "cleric" }, { id: "bless", source: "cleric" }];
+  ch.spells = [{ id: "sacred-flame", source: "cleric" }, { id: "bless", source: "cleric" }, { id: "toll-the-dead", source: "cleric" }];
   s = E.compute(ch);
+  eq("Glas : 1d8, 1d12 si blessée", [s.attacks.find((a) => a.name === "Glas").damage, s.attacks.find((a) => a.name === "Glas").alt], ["1d8 nécrotique", "1d12 si blessée"]);
   eq("Clerc 1 : PV 8 + CON 2", s.hp.max, 10);
   eq("Clerc 1 : DD 13, 3 sorts mineurs, 4 sorts préparés, 2 emplacements", [s.casting[0].dc, s.casting[0].cantrips, s.casting[0].prepared, s.spellSlots[0].max], [13, 3, 4, 2]);
   eq("Thaumaturge : Assistance en plus", !!s.spells.find((x) => x.spell.id === "guidance" && x.alwaysPrepared), true);
@@ -84,6 +85,7 @@ module.exports = function (DND, eq) {
   eq("Clerc 7 : 11 sorts préparés", s.casting[0].prepared, 11);
   eq("Vie : sorts de domaine jusqu'au niveau 7", ["aid", "mass-healing-word", "death-ward"].every((id) => s.spells.some((x) => x.spell.id === id && x.alwaysPrepared)), true);
   eq("Vie : pas encore les sorts du niveau 9", s.spells.some((x) => x.spell.id === "mass-cure-wounds"), false);
+  eq("Glas niveau 7 + Incantation puissante : 2d12+3 si blessée", s.attacks.find((a) => a.name === "Glas").alt, "2d12+3 si blessée");
   eq("Incantation puissante : Flamme sacrée 2d8+3", s.spells.find((x) => x.spell.id === "sacred-flame").damage, "2d8+3 radiant");
   eq("Survivance : 35 PV", s.actions.find((a) => a.name.en === "Preserve Life").description.includes("35 PV"), true);
   eq("Étincelle divine 2d8 au niveau 7", s.actions.find((a) => a.name.en === "Divine Spark").description.includes("2d8"), true);

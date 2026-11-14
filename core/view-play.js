@@ -281,7 +281,7 @@
             a.bond ? h("span", { class: "tag", title: a.bond }, s.weaponBond ? s.weaponBond.column : "Pacte") : null,
             a.option ? h("span", { class: "tag", title: "Dégâts et caractéristique calculés avec " + a.option }, a.option) : null),
           h("td", null, a.toHit != null ? sg(a.toHit) : a.save ? h("span", { class: ["ability-color", "ability-" + a.save.ability] }, "JS " + DND.data.labels[a.save.ability].short + " " + a.save.dc) : "—"),
-          h("td", null, a.damage, a.versatile ? h("small", { class: "muted" }, " (" + a.versatile + " à 2 mains)") : null),
+          h("td", null, a.damage, a.alt ? h("small", { class: "muted" }, " (" + a.alt + ")") : null),
           h("td", null, a.range))))));
   }
 
@@ -417,7 +417,7 @@
     const effect = [];
     if (spell.attack) effect.push("Attaque " + sg(sp.attack));
     if (spell.save && sp.dc) effect.push("JS " + DND.data.labels[spell.save].short + " DD " + sp.dc);
-    if (sp.damage) effect.push(sp.damage);
+    if (sp.damage) effect.push(sp.damage + (sp.damageAlt ? " (" + sp.damageAlt + ")" : ""));
     return h("li", { class: "spell" },
       h("div", { class: "spell-main" },
         actionMarker(spell.castingTime),

@@ -1,5 +1,9 @@
 # Journal de développement : fiches D&D 5.5 (règles 2024)
 
+## 2026-11-14 : Dégâts alternatifs des sorts (Glas)
+
+Option générique `damage.alt: { dice, label }` sur un sort : le moteur la met à l'échelle comme les dégâts normaux (tour de magie, emplacement de pacte, bonus `spellDamage`) et l'affiche en petit gris après les dégâts, comme l'arme polyvalente (les attaques portent maintenant un champ `alt` commun aux deux). Glas : « (2d12 si blessée) » au niveau 5 ; Châtiment divin : « (3d8 contre fiélon ou mort-vivant) ». 493 tests.
+
 ## 2026-11-14 : Sorts de soin hors du noyau
 
 Les listes `HEALING_SPELLS` / `HEALING_VALUES` quittent `core/view-play.js`. Chaque sort porte son champ `heal` (`{ dice, mod: true }` ou `{ text }`) dans `modules/spells/` ; le moteur calcule `sp.heal` (dés + modificateur d'incantation, + dés de l'emplacement de pacte) et la carte « Soins » liste les sorts qui en ont un. Plus de détection par le nom du sort.

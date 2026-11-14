@@ -272,6 +272,7 @@
         h("thead", null, h("tr", null, h("th", null, "Nom"), h("th", null, "Attaque"), h("th", null, "Dégâts"), h("th", null, "Portée"))),
         h("tbody", null, s.attacks.map((a) => h("tr", { class: a.kind === "weapon" && !a.equipped ? "dim" : "" },
           h("td", { title: [en(a.nameEn), a.props.join(", ")].filter(Boolean).join(" · ") },
+            actionMarker(a.kind === "spell" ? a.spell.castingTime : "action"),
             a.kind === "spell" && a.spell && !a.spell.custom
               ? h("a", { href: DND.config.spellUrl(a.spell), target: "_blank", rel: "noopener", title: "EN : " + a.spell.name.en + " · description complète sur AideDD" }, a.name)
               : a.name,
@@ -300,11 +301,19 @@
         const spell = sp.spell;
         const info = [spell.level ? "Niveau " + spell.level : "Tour de magie", E.range(spell.range), spell.duration].filter(Boolean).join(" · ");
         return h("li", null,
-          spell.custom ? h("b", null, spell.name.fr)
-            : h("a", { href: DND.config.spellUrl(spell), target: "_blank", rel: "noopener", title: "EN : " + spell.name.en + " · description complète sur AideDD" }, spell.name.fr),
+          h("span", { class: "support-spell-name" }, actionMarker(spell.castingTime),
+            spell.custom ? h("b", null, spell.name.fr)
+              : h("a", { href: DND.config.spellUrl(spell), target: "_blank", rel: "noopener", title: "EN : " + spell.name.en + " · description complète sur AideDD" }, spell.name.fr)),
           h("span", { class: "small-text muted" }, info + (spell.concentration ? " · Concentration" : "")),
           sp.heal ? h("b", { class: "healing-value" }, sp.heal) : null);
       })));
+  }
+
+  function actionMarker(castingTime) {
+    if (castingTime !== "action" && castingTime !== "bonus") return null;
+    const label = castingTime === "action" ? "Action" : "Action bonus";
+    return h("span", { class: ["action-cost-marker", castingTime === "action" ? "action-cost-action" : "action-cost-bonus"],
+      role: "img", "aria-label": label, title: label });
   }
 
   function pips(count, spent, action, data) {
@@ -411,6 +420,7 @@
     if (sp.damage) effect.push(sp.damage);
     return h("li", { class: "spell" },
       h("div", { class: "spell-main" },
+        actionMarker(spell.castingTime),
         spell.custom ? h("b", null, spell.name.fr)
           : h("a", { href: DND.config.spellUrl(spell), target: "_blank", rel: "noopener", title: "EN : " + spell.name.en + " · description complète sur AideDD" }, spell.name.fr),
         tags,

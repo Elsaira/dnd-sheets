@@ -164,9 +164,13 @@ tr.dim td { opacity: .6; }
 .compact-table th:nth-child(3) { width: 28%; }
 .compact-table th:nth-child(4) { width: 25%; }
 .compact-table th + th, .compact-table td + td { border-left: 1px solid var(--border); padding-left: .4rem; }
+.action-cost-marker { display: inline-block; flex: 0 0 auto; vertical-align: middle; margin-right: .3rem; }
+.action-cost-action { width: .48rem; height: .48rem; border-radius: 50%; background: var(--good); }
+.action-cost-bonus { width: 0; height: 0; border-right: .36rem solid transparent; border-bottom: .62rem solid #c96e12; border-left: .36rem solid transparent; }
 .support-spells { list-style: none; margin: 0; padding: 0; }
 .support-spells li { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: .15rem .6rem; padding: .25rem 0; border-bottom: 1px dashed var(--border); }
 .support-spells li:last-child { border-bottom: none; }
+.support-spell-name { display: inline-flex; align-items: center; gap: .3rem; }
 .healing-value { margin-left: auto; color: var(--good); white-space: nowrap; }
 .inventory input[type="text"] { width: 100%; }
 

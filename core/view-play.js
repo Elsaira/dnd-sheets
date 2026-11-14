@@ -96,8 +96,9 @@
   // --- Onglet Combat ---
   function combat(App) {
     const s = App.sheet, ch = App.ch;
-    const attackCards = [attacksCard(s), supportSpellsCard(s)].filter(Boolean);
-    const attackPair = attackCards.length > 1 ? h("div", { class: "attack-support-pair" }, attackCards) : attackCards[0];
+    const attacks = attacksCard(s), supports = supportSpellsCard(s), healing = healingSpellsCard(s);
+    const attackCards = [attacks, supports, healing].filter(Boolean);
+    const attackPair = attackCards.length > 1 ? h("div", { class: ["attack-support-pair", supports && healing && "support-healing-grid"] }, attackCards) : attackCards[0];
     const resourceCards = [resourcesCard(s), slotsCard(s)].filter(Boolean);
     return h("div", { class: "grid2 combat-grid" },
       h("div", null, hpCard(App), concentrationCard(App), restCard(s), conditionsCard(ch, s), s.companions.map((cp) => companionCard(App, cp))),
@@ -266,7 +267,7 @@
   }
 
   function attacksCard(s) {
-    return h("section", { class: "card" }, h("h3", null, "Attaques"),
+    return h("section", { class: ["card", "attack-zone"] }, h("h3", null, "Attaques"),
       h("table", { class: "attacks compact-table" },
         h("thead", null, h("tr", null, h("th", null, "Nom"), h("th", null, "Attaque"), h("th", null, "Dégâts"), h("th", null, "Portée"))),
         h("tbody", null, s.attacks.map((a) => h("tr", { class: a.kind === "weapon" && !a.equipped ? "dim" : "" },
@@ -283,18 +284,55 @@
           h("td", null, a.range))))));
   }
 
+  const HEALING_SPELLS = new Set([
+    "cure-wounds", "healing-word", "prayer-of-healing", "aura-of-vitality", "mass-healing-word", "mass-cure-wounds",
+    "goodberry", "aid", "revivify", "raise-dead",
+  ]);
+  const isHealingSpell = (sp) => HEALING_SPELLS.has(sp.spell.id) || /soin|guérison|heal|cure/i.test(sp.spell.name.fr + " " + (sp.spell.name.en || ""));
   function supportSpellsCard(s) {
-    const supportSpells = s.spells.filter((sp) => !sp.spell.damage && !sp.spell.attack)
-      .sort((a, b) => a.spell.level - b.spell.level || a.spell.name.fr.localeCompare(b.spell.name.fr));
-    if (!supportSpells.length) return null;
-    return h("section", { class: "card" }, h("h3", null, "Sorts de supports"),
-      h("ul", { class: "support-spells" }, supportSpells.map((sp) => {
+    return spellListCard(s, "Sorts de supports", s.spells.filter((sp) => !sp.spell.damage && !sp.spell.attack && !isHealingSpell(sp)), "support-spells-card");
+  }
+
+  function healingSpellsCard(s) {
+    return spellListCard(s, "Soins", s.spells.filter(isHealingSpell), "healing-spells-card");
+  }
+
+  const HEALING_VALUES = {
+    "cure-wounds": { dice: "2d8", modifier: true },
+    "healing-word": { dice: "2d4", modifier: true },
+    "prayer-of-healing": { dice: "2d8" },
+    "aura-of-vitality": { text: "2d6 par action bonus" },
+    "mass-healing-word": { dice: "2d4", modifier: true },
+    "mass-cure-wounds": { dice: "3d8", modifier: true },
+    goodberry: { text: "1 PV par baie (10 baies)" },
+    aid: { text: "+5 PV max et actuels par cible" },
+    revivify: { text: "1 PV" },
+    "raise-dead": { text: "1 PV" },
+  };
+  function healingValue(s, sp) {
+    const value = HEALING_VALUES[sp.spell.id];
+    if (!value) return null;
+    if (value.text) return value.text;
+    const modifier = value.modifier && sp.ability ? s.abilities[sp.ability].mod : 0;
+    let result = value.dice + (modifier ? E.signed(modifier) : "");
+    const upcast = sp.upcast && sp.upcast.summary.find((line) => line.startsWith("soins +"));
+    if (upcast) result += " (" + upcast.replace("soins +", "+") + ")";
+    return result + " PV";
+  }
+
+  function spellListCard(s, title, spells, className) {
+    const sorted = spells.slice().sort((a, b) => a.spell.level - b.spell.level || a.spell.name.fr.localeCompare(b.spell.name.fr));
+    if (!sorted.length) return null;
+    return h("section", { class: ["card", className] }, h("h3", null, title),
+      h("ul", { class: "support-spells" }, sorted.map((sp) => {
         const spell = sp.spell;
         const info = [spell.level ? "Niveau " + spell.level : "Tour de magie", E.range(spell.range), spell.duration].filter(Boolean).join(" · ");
+        const healing = className === "healing-spells-card" ? healingValue(s, sp) : null;
         return h("li", null,
           spell.custom ? h("b", null, spell.name.fr)
             : h("a", { href: DND.config.spellUrl(spell), target: "_blank", rel: "noopener", title: "EN : " + spell.name.en + " · description complète sur AideDD" }, spell.name.fr),
-          h("span", { class: "small-text muted" }, info + (spell.concentration ? " · Concentration" : "")));
+          h("span", { class: "small-text muted" }, info + (spell.concentration ? " · Concentration" : "")),
+          healing ? h("b", { class: "healing-value" }, healing) : null);
       })));
   }
 

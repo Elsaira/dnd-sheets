@@ -55,6 +55,10 @@ label { display: inline-flex; align-items: center; gap: .3rem; }
 .grid2 > div { min-width: 0; }
 .resource-pair, .attack-support-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .7rem; }
 .resource-pair > .card, .attack-support-pair > .card { min-width: 0; }
+.attack-support-pair.support-healing-grid { grid-template-areas: "attacks supports" "healing supports"; grid-template-rows: auto auto; }
+.support-healing-grid > .attack-zone { grid-area: attacks; }
+.support-healing-grid > .support-spells-card { grid-area: supports; }
+.support-healing-grid > .healing-spells-card { grid-area: healing; }
 
 /* Mise en page du mode Jeu : colonne gauche fixe, contenu à droite */
 .play { display: grid; grid-template-columns: 14rem minmax(0, 1fr); gap: .8rem; padding: .8rem 1rem; align-items: start; }
@@ -162,6 +166,7 @@ tr.dim td { opacity: .6; }
 .support-spells { list-style: none; margin: 0; padding: 0; }
 .support-spells li { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: .15rem .6rem; padding: .25rem 0; border-bottom: 1px dashed var(--border); }
 .support-spells li:last-child { border-bottom: none; }
+.healing-value { margin-left: auto; color: var(--good); white-space: nowrap; }
 .inventory input[type="text"] { width: 100%; }
 
 .spells { list-style: none; margin: 0; padding: 0; }
@@ -209,6 +214,7 @@ tr.dim td { opacity: .6; }
 }
 @media (max-width: 520px) {
   .resource-pair, .attack-support-pair { grid-template-columns: 1fr; gap: 0; }
+  .attack-support-pair.support-healing-grid { grid-template-areas: "attacks" "supports" "healing"; grid-template-rows: auto auto auto; }
 }
 .hp-current.small { font-size: 1.4rem; }
 

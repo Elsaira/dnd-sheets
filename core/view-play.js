@@ -294,7 +294,9 @@
   }
 
   function healingSpellsCard(s) {
-    return spellListCard(s, "Soins", s.spells.filter(isHealingSpell), "healing-spells-card");
+    const healingSpells = s.spells.filter(isHealingSpell);
+    if (!healingSpells.length) return null;
+    return spellListCard(s, "Soins", healingSpells, "healing-spells-card");
   }
 
   const HEALING_VALUES = {

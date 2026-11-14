@@ -1,5 +1,9 @@
 # Journal de développement : fiches D&D 5.5 (règles 2024)
 
+## 2026-11-14 : AGENTS.md pour les autres IA
+
+AGENTS.md décrit les règles du projet pour toute IA qui modifie le dépôt : aucun code propre à une classe dans `core/` (option générique côté noyau, données dans `modules/`), organisation des fichiers, style, sources de règles, vérifications avant chaque commit.
+
 ## 2026-11-14 : Fusion des corrections avec la carte Soins
 
 Fusion de la branche de corrections avec les deux commits suivants de l'ami (carte « Soins », valeurs de soin). Grille attaques / soutien / soins : une colonne par défaut (le tableau des attaques garde toute la largeur), deux colonnes seulement à partir de 1900 px.

@@ -46,7 +46,7 @@
   function skills(s) {
     const groups = DND.data.abilities.map((a) => [a, Object.entries(DND.data.skills).filter(([, d]) => d.ability === a)
       .sort(([, x], [, y]) => x.fr.localeCompare(y.fr))]).filter(([, list]) => list.length);
-    return h("section", { class: "card" }, h("h3", null, "Compétences"),
+    return h("section", { class: "card narrow-sidebar-card" }, h("h3", null, "Compétences"),
       groups.map(([a, list]) => h("div", { class: "skill-group" },
         h("div", { class: "skill-group-head", title: en(DND.data.labels[a].en) }, DND.data.labels[a].fr, h("span", null, sg(s.abilities[a].mod))),
         h("ul", { class: "skills" }, list.map(([id, def]) => {
@@ -59,7 +59,7 @@
   }
 
   function passives(s) {
-    return h("section", { class: "card" }, h("h3", null, "Valeurs passives"),
+    return h("section", { class: "card narrow-sidebar-card" }, h("h3", null, "Valeurs passives"),
       h("div", { class: "kv" }, "Perception", h("b", null, s.passive.perception)),
       h("div", { class: "kv" }, "Intuition", h("b", null, s.passive.insight)),
       h("div", { class: "kv" }, "Investigation", h("b", null, s.passive.investigation)),
@@ -68,7 +68,7 @@
 
   function proficiencies(s) {
     const line = (title, ids) => ids.length ? h("p", null, h("b", null, title + " : "), ids.map((x) => DND.label(x)).join(", ")) : null;
-    return h("section", { class: "card small-text" }, h("h3", null, "Maîtrises et langues"),
+    return h("section", { class: "card small-text narrow-sidebar-card" }, h("h3", null, "Maîtrises et langues"),
       line("Armures", s.proficiencies.armor),
       line("Armes", s.proficiencies.weapons),
       line("Outils", s.proficiencies.tools),
@@ -96,9 +96,12 @@
   // --- Onglet Combat ---
   function combat(App) {
     const s = App.sheet, ch = App.ch;
-    return h("div", { class: "grid2" },
+    const attackCards = [attacksCard(s), supportSpellsCard(s)].filter(Boolean);
+    const attackPair = attackCards.length > 1 ? h("div", { class: "attack-support-pair" }, attackCards) : attackCards[0];
+    const resourceCards = [resourcesCard(s), slotsCard(s)].filter(Boolean);
+    return h("div", { class: "grid2 combat-grid" },
       h("div", null, hpCard(App), concentrationCard(App), restCard(s), conditionsCard(ch, s), s.companions.map((cp) => companionCard(App, cp))),
-      h("div", null, attacksCard(s), resourcesCard(s), slotsCard(s), actionsCard(s), notesCard(s)));
+      h("div", null, attackPair, resourceCards.length ? h("div", { class: "resource-pair" }, resourceCards) : null, actionsCard(s), notesCard(s)));
   }
 
   function hpCard(App) {
@@ -264,7 +267,7 @@
 
   function attacksCard(s) {
     return h("section", { class: "card" }, h("h3", null, "Attaques"),
-      h("table", { class: "attacks" },
+      h("table", { class: "attacks compact-table" },
         h("thead", null, h("tr", null, h("th", null, "Nom"), h("th", null, "Attaque"), h("th", null, "Dégâts"), h("th", null, "Portée"))),
         h("tbody", null, s.attacks.map((a) => h("tr", { class: a.kind === "weapon" && !a.equipped ? "dim" : "" },
           h("td", { title: [en(a.nameEn), a.props.join(", ")].filter(Boolean).join(" · ") },
@@ -278,6 +281,21 @@
           h("td", null, a.toHit != null ? sg(a.toHit) : a.save ? "JS " + DND.data.labels[a.save.ability].short + " " + a.save.dc : "—"),
           h("td", null, a.damage, a.versatile ? h("small", { class: "muted" }, " (" + a.versatile + " à 2 mains)") : null),
           h("td", null, a.range))))));
+  }
+
+  function supportSpellsCard(s) {
+    const supportSpells = s.spells.filter((sp) => !sp.spell.damage && !sp.spell.attack)
+      .sort((a, b) => a.spell.level - b.spell.level || a.spell.name.fr.localeCompare(b.spell.name.fr));
+    if (!supportSpells.length) return null;
+    return h("section", { class: "card" }, h("h3", null, "Sorts de supports"),
+      h("ul", { class: "support-spells" }, supportSpells.map((sp) => {
+        const spell = sp.spell;
+        const info = [spell.level ? "Niveau " + spell.level : "Tour de magie", E.range(spell.range), spell.duration].filter(Boolean).join(" · ");
+        return h("li", null,
+          spell.custom ? h("b", null, spell.name.fr)
+            : h("a", { href: DND.config.spellUrl(spell), target: "_blank", rel: "noopener", title: "EN : " + spell.name.en + " · description complète sur AideDD" }, spell.name.fr),
+          h("span", { class: "small-text muted" }, info + (spell.concentration ? " · Concentration" : "")));
+      })));
   }
 
   function pips(count, spent, action, data, canRecover) {

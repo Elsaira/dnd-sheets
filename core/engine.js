@@ -813,7 +813,7 @@
       damage: (unarmed.dice ? unarmed.dice + (unarmedMod ? E.signed(unarmedMod) : "") : Math.max(0, 1 + unarmedMod)) + " contondant",
       range: E.meters(5), props: [], option: unarmed.label });
     for (const s of sheet.spells) {
-      if (s.spell.level === 0 && s.spell.damage && (s.spell.attack || s.spell.save)) {
+      if (s.spell.damage && (s.spell.attack || s.spell.save)) {
         attacks.push({ kind: "spell", spell: s.spell, name: s.spell.name.fr, nameEn: s.spell.name.en, toHit: s.spell.attack ? s.attack : null,
           save: s.spell.save ? { ability: s.spell.save, dc: s.dc } : null, damage: s.damage,
           range: E.range(s.spell.range), props: [] });

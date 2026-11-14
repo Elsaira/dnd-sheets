@@ -225,10 +225,12 @@ module.exports = function (DND, eq) {
   ch.classes[0].level = 5;
   ch.classes[0].subclass = "draconic";
   ch.classes[0].choices.metamagic = ["quickened-spell", "twinned-spell"];
+  ch.spells.push({ id: "scorching-ray", source: "sorcerer" });
   s = E.compute(ch);
   eq("Ensorceleur 5 : 5 points de sorcellerie", res(s, "sorcerer.sorceryPoints").max, 5);
   eq("Ensorceleur 5 : Restauration ensorcelée", res(s, "sorcerer.sorcerousRestoration").max, 1);
   eq("Ensorceleur 5 : emplacements 4/3/2, 9 sorts", [s.spellSlots.map((x) => x.max), s.casting[0].prepared], [[4, 3, 2], 9]);
+  eq("Rayon ardent de niveau 2 dans les attaques", [s.attacks.find((a) => a.spell && a.spell.id === "scorching-ray").name, s.attacks.find((a) => a.spell && a.spell.id === "scorching-ray").toHit], ["Rayon ardent", 6]);
   eq("Draconique : PV 6 + 4×4 + 5×CON 2 + 5", s.hp.max, 6 + 16 + 10 + 5);
   eq("Draconique : CA 10 + DEX 2 + CHA 3", s.ac.value, 15);
   eq("Draconique : sorts niv. 3 et 5", ["dragons-breath", "fly"].every((id) => s.spells.some((x) => x.spell.id === id && x.alwaysPrepared)), true);

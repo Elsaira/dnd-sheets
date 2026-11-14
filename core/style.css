@@ -51,13 +51,17 @@ label { display: inline-flex; align-items: center; gap: .3rem; }
 .row.end { justify-content: flex-end; }
 .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: .7rem; }
 .grid2 > div { min-width: 0; }
+.resource-pair, .attack-support-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .7rem; }
+.resource-pair > .card, .attack-support-pair > .card { min-width: 0; }
 
 /* Mise en page du mode Jeu : colonne gauche fixe, contenu à droite */
-.play { display: grid; grid-template-columns: 290px 1fr; gap: .8rem; padding: .8rem 1rem; align-items: start; }
+.play { display: grid; grid-template-columns: 14rem minmax(0, 1fr); gap: .8rem; padding: .8rem 1rem; align-items: start; }
 .left { position: sticky; top: 4.2rem; }
+.narrow-sidebar-card { width: 14rem; max-width: 100%; }
+.combat-grid { grid-template-columns: minmax(0, 29rem) minmax(0, 1fr); }
 .empty, .build { padding: .8rem 1rem; max-width: 1100px; }
 
-.abilities { display: grid; grid-template-columns: repeat(3, 1fr); gap: .4rem; margin-bottom: .7rem; }
+.abilities { display: grid; grid-template-columns: repeat(3, 1fr); gap: .4rem; width: 14rem; max-width: 100%; margin-bottom: .7rem; }
 .ability { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; text-align: center; padding: .35rem .2rem; }
 .ab-name { font-size: .75rem; font-weight: 600; color: var(--muted); letter-spacing: .05em; }
 .ab-mod { font-size: 1.5rem; font-weight: 700; line-height: 1.1; }
@@ -94,6 +98,7 @@ label { display: inline-flex; align-items: center; gap: .3rem; }
 .bar-fill { height: 100%; background: var(--good); }
 .bar-fill.low { background: var(--bad); }
 input.amount { width: 6rem; }
+.hp > .row { flex-wrap: wrap; }
 .hit-dice { margin-top: .4rem; }
 .death { margin-top: .5rem; padding: .3rem .4rem; border: 2px solid var(--bad); border-radius: 6px; }
 .death .row { gap: .8rem; }
@@ -133,6 +138,16 @@ table { width: 100%; border-collapse: collapse; }
 th { text-align: left; font-size: .75rem; color: var(--muted); text-transform: uppercase; font-weight: 600; padding: .2rem .3rem; }
 td { padding: .25rem .3rem; border-top: 1px solid var(--border); vertical-align: middle; }
 tr.dim td { opacity: .6; }
+.compact-table { table-layout: fixed; font-size: .8rem; }
+.compact-table th, .compact-table td { padding: .18rem .25rem; overflow-wrap: anywhere; }
+.compact-table th:nth-child(1) { width: 22%; }
+.compact-table th:nth-child(2) { width: 25%; }
+.compact-table th:nth-child(3) { width: 28%; }
+.compact-table th:nth-child(4) { width: 25%; }
+.compact-table th + th, .compact-table td + td { border-left: 1px solid var(--border); padding-left: .4rem; }
+.support-spells { list-style: none; margin: 0; padding: 0; }
+.support-spells li { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: .15rem .6rem; padding: .25rem 0; border-bottom: 1px dashed var(--border); }
+.support-spells li:last-child { border-bottom: none; }
 .inventory input[type="text"] { width: 100%; }
 
 .spells { list-style: none; margin: 0; padding: 0; }
@@ -169,6 +184,12 @@ tr.dim td { opacity: .6; }
   .main { order: 1; }
   .left .card { order: 2; }
   .grid2 { grid-template-columns: 1fr; }
+}
+@media (min-width: 901px) and (max-width: 1100px) {
+  .combat-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 520px) {
+  .resource-pair, .attack-support-pair { grid-template-columns: 1fr; gap: 0; }
 }
 .hp-current.small { font-size: 1.4rem; }
 

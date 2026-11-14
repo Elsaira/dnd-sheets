@@ -35,7 +35,7 @@
         h("tbody", null, DND.data.abilities.map((a) => {
           const base = Number(ch.abilities[a]);
           const total = s.abilities[a].score;
-          return h("tr", null,
+          return h("tr", { class: ["ability-row", "ability-color", "ability-" + a] },
             h("td", { title: "EN : " + DND.data.labels[a].en }, DND.data.labels[a].fr),
             h("td", null, h("input", { type: "number", min: 1, max: 30, class: "narrow", value: base, "data-bind": "abilities." + a })),
             h("td", null, total !== base ? sg(total - base) : ""),
@@ -218,7 +218,7 @@
     return h("section", { class: "card" }, h("h2", null, "Bonus de caractéristique supplémentaires"),
       h("p", { class: "muted small-text" }, "Pour un historique personnalisé : +2 à l'une et +1 à une autre, ou +1 à trois (maximum 20). Si votre historique donne déjà ses bonus, laissez vide."),
       h("span", { class: ["count", n === 3 ? "ok" : "todo"] }, "Points " + n + " / 3"),
-      h("div", { class: "steppers" }, DND.data.abilities.map((a) => h("span", { class: "stepper" }, DND.data.labels[a].fr + " ",
+      h("div", { class: "steppers" }, DND.data.abilities.map((a) => h("span", { class: ["stepper", "ability-color", "ability-" + a] }, DND.data.labels[a].fr + " ",
         h("button", { class: "small", "data-action": "stepExtraAbility", "data-ability": a, "data-delta": -1, disabled: !x[a] }, "−"),
         h("b", null, " +" + (x[a] || 0) + " "),
         h("button", { class: "small", "data-action": "stepExtraAbility", "data-ability": a, "data-delta": 1, disabled: (x[a] || 0) >= 2 }, "+")))));

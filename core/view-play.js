@@ -33,11 +33,11 @@
   function abilities(s) {
     return h("section", { class: "abilities" }, DND.data.abilities.map((a) => {
       const ab = s.abilities[a], l = DND.data.labels[a];
-      return h("div", { class: "ability", title: en(l.en) },
+      return h("div", { class: ["ability", "ability-color", "ability-" + a], title: en(l.en) },
         h("div", { class: "ab-name" }, l.short),
         h("div", { class: "ab-mod" }, sg(ab.mod)),
         h("div", { class: "ab-score" }, ab.score),
-        h("div", { class: ["ab-save", ab.save.proficient && "prof"], title: "Jet de sauvegarde" + (ab.save.advantage.length ? " · avantage : " + ab.save.advantage.join(", ") : "") },
+        h("div", { class: ["ab-save", "ability-color", "ability-" + a, ab.save.proficient && "prof"], title: "Jet de sauvegarde" + (ab.save.advantage.length ? " · avantage : " + ab.save.advantage.join(", ") : "") },
           h("span", { class: "dot" }), "JS ", sg(ab.save.bonus), ab.save.advantage.length ? h("span", { class: "adv" }, " A") : null));
     }));
   }
@@ -48,7 +48,7 @@
       .sort(([, x], [, y]) => x.fr.localeCompare(y.fr))]).filter(([, list]) => list.length);
     return h("section", { class: "card narrow-sidebar-card" }, h("h3", null, "Compétences"),
       groups.map(([a, list]) => h("div", { class: "skill-group" },
-        h("div", { class: "skill-group-head", title: en(DND.data.labels[a].en) }, DND.data.labels[a].fr, h("span", null, sg(s.abilities[a].mod))),
+        h("div", { class: ["skill-group-head", "ability-color", "ability-" + a], title: en(DND.data.labels[a].en) }, DND.data.labels[a].fr, h("span", null, sg(s.abilities[a].mod))),
         h("ul", { class: "skills" }, list.map(([id, def]) => {
           const sk = s.skills[id];
           return h("li", { title: en(def.en) + (sk.advantage.length ? " · avantage : " + sk.advantage.join(", ") : "") },
@@ -89,8 +89,8 @@
       h("button", { class: ["stat", "toggle", ch.state.heroicInspiration && "on"], "data-action": "inspiration", title: "Inspiration héroïque (Heroic Inspiration) : relancer un dé" },
         h("div", { class: "stat-label" }, "Inspiration"), h("div", { class: "stat-value" }, ch.state.heroicInspiration ? "★" : "☆")));
   }
-  function stat(label, value, title) {
-    return h("div", { class: "stat", title }, h("div", { class: "stat-label" }, label), h("div", { class: "stat-value" }, value));
+  function stat(label, value, title, ability) {
+    return h("div", { class: ["stat", ability && "ability-color", ability && "ability-" + ability], title }, h("div", { class: "stat-label" }, label), h("div", { class: "stat-value" }, value));
   }
 
   // --- Onglet Combat ---
@@ -278,7 +278,7 @@
             a.kind === "weapon" && !a.proficient ? h("span", { class: "tag warn", title: "Arme non maîtrisée" }, "non maîtrisée") : null,
             a.bond ? h("span", { class: "tag", title: a.bond }, s.weaponBond ? s.weaponBond.column : "Pacte") : null,
             a.option ? h("span", { class: "tag", title: "Dégâts et caractéristique calculés avec " + a.option }, a.option) : null),
-          h("td", null, a.toHit != null ? sg(a.toHit) : a.save ? "JS " + DND.data.labels[a.save.ability].short + " " + a.save.dc : "—"),
+          h("td", null, a.toHit != null ? sg(a.toHit) : a.save ? h("span", { class: ["ability-color", "ability-" + a.save.ability] }, "JS " + DND.data.labels[a.save.ability].short + " " + a.save.dc) : "—"),
           h("td", null, a.damage, a.versatile ? h("small", { class: "muted" }, " (" + a.versatile + " à 2 mains)") : null),
           h("td", null, a.range))))));
   }
@@ -375,7 +375,7 @@
         return h("section", { class: "card casting" },
           h("h3", null, c.name.fr),
           h("div", { class: "strip small" },
-            stat("Caractéristique", DND.data.labels[c.ability].short),
+            stat("Caractéristique", DND.data.labels[c.ability].short, null, c.ability),
             stat("DD des sorts", c.dc),
             stat("Attaque de sort", sg(c.attack)),
             stat("Tours de magie", cantrips + " / " + c.cantrips),

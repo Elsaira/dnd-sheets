@@ -1,5 +1,9 @@
 # Journal de développement : fiches D&D 5.5 (règles 2024)
 
+## 2026-11-14 : Domaine du Sépulcre (modifs d'un ami) et corrections
+- Commits d'un ami sur main : noms de la VF (Domaine du Sépulcre, Cercle de mortalité, Empire funeste, Vigueur d'outre-tombe, Voie du Sépulcre), textes précisés, Gardien des âmes récupérable avec un emplacement de niveau 6+ ; sorts à dégâts de tout niveau dans les attaques avec lien AideDD ; carte « Sorts de soutien » ; couleurs des caractéristiques ; colonne gauche à 14rem.
+- Corrections : le code propre au clerc quitte le noyau. Effet `resource` générique : `slotRegain: n` (boutons « Niv. X » pour récupérer une utilisation en dépensant un emplacement de niveau n+, `R.regainWithSlot`) et `blockedBy: "<état>"` (dépense refusée sous cet état). Les pastilles permettent de nouveau d'annuler un clic. Tableau des attaques en pleine largeur quand la place manque (`.attack-support-pair` en auto-fit 24rem), utile vers 1060 px. 488 tests.
+
 ## 2026-11-11 : Shadar-kai, Sens aiguisés
 
 Ajout du trait Sens aiguisés (maîtrise de Perception) oublié dans species/shadar-kai.js.

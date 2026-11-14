@@ -53,7 +53,8 @@ label { display: inline-flex; align-items: center; gap: .3rem; }
 .row.end { justify-content: flex-end; }
 .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: .7rem; }
 .grid2 > div { min-width: 0; }
-.resource-pair, .attack-support-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .7rem; }
+.resource-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .7rem; }
+.attack-support-pair { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 24rem), 1fr)); gap: 0 .7rem; }
 .resource-pair > .card, .attack-support-pair > .card { min-width: 0; }
 
 /* Mise en page du mode Jeu : colonne gauche fixe, contenu à droite */
@@ -143,7 +144,7 @@ button.chip.on .chip-mark { color: #fff; }
 .resource-stack { padding: .25rem 0; border-bottom: 1px dashed var(--border); }
 .resource-stack:last-child { border-bottom: none; }
 .resource-stack > .resource { border-bottom: none; }
-.grave-recovery { display: flex; align-items: center; flex-wrap: wrap; gap: .3rem; padding-left: .2rem; }
+.slot-regain { display: flex; align-items: center; flex-wrap: wrap; gap: .3rem; padding-left: .2rem; }
 .resource > .res-name { flex: 1 1 auto; min-width: 0; }
 .resource > .pips, .resource > .row, .resource > .counter { flex: 0 0 auto; max-width: 60%; justify-content: flex-end; }
 .counter { white-space: nowrap; }
@@ -208,7 +209,7 @@ tr.dim td { opacity: .6; }
   .combat-grid { grid-template-columns: 1fr; }
 }
 @media (max-width: 520px) {
-  .resource-pair, .attack-support-pair { grid-template-columns: 1fr; gap: 0; }
+  .resource-pair { grid-template-columns: 1fr; gap: 0; }
 }
 .hp-current.small { font-size: 1.4rem; }
 

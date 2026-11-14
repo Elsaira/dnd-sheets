@@ -277,18 +277,19 @@
           h("td", null, a.range))))));
   }
 
-  function pips(count, spent, action, data) {
+  function pips(count, spent, action, data, canRecover) {
+    if (canRecover == null) canRecover = true;
     if (count > 12) {
       return h("span", { class: "counter" },
         h("button", { class: "small", "data-action": action, "data-delta": 1, ...data }, "−"),
         h("b", null, " " + (count - spent) + " / " + count + " "),
-        h("button", { class: "small", "data-action": action, "data-delta": -1, ...data }, "+"));
+        h("button", { class: "small", "data-action": action, "data-delta": -1, disabled: !canRecover, title: canRecover ? "Récupérer" : "Récupération par repos ou emplacement niv. 6+ uniquement", ...data }, "+"));
     }
     const out = [];
     for (let i = 0; i < count; i++) {
       const available = i < count - spent;
       out.push(h("button", { class: ["pip", available && "full"], "data-action": action, "data-delta": available ? 1 : -1, ...data,
-        title: available ? "Dépenser" : "Récupérer" }));
+        disabled: !available && !canRecover, title: available ? "Dépenser" : canRecover ? "Récupérer" : "Récupération par repos ou emplacement niv. 6+ uniquement" }));
     }
     return h("span", { class: "pips" }, out);
   }
@@ -297,10 +298,19 @@
   // Ressource rattachée à un compagnon (effet resource avec companion) : affichée sur sa carte
   const onCompanion = (s, r) => r.companion && s.companions.some((cp) => cp.id === r.companion);
   function resourceRow(r) {
-    return h("div", { class: "resource", title: (r.description || "") + (r.name.en ? " (EN : " + r.name.en + ")" : "") },
+    const isKeeper = r.id === "cleric.keeperOfSouls";
+    const slots = isKeeper && r.spent > 0 ? DND.app.sheet.spellSlots.filter((sl) => sl.level >= 6 && sl.spent < sl.max) : [];
+    const incapacitated = DND.app.ch.state.conditions.includes("incapacitated");
+    const row = h("div", { class: "resource", title: (r.description || "") + (r.name.en ? " (EN : " + r.name.en + ")" : "") },
       h("div", { class: "res-name" }, r.name.fr, h("small", { class: "muted" },
-        " · " + RECHARGE[r.recharge] + (r.shortRegain ? " (" + r.shortRegain + " au repos court)" : ""))),
-      pips(r.max, r.spent, "resource", { "data-id": r.id }));
+        " · " + (isKeeper ? "repos court ou long" : RECHARGE[r.recharge]) + (r.shortRegain ? " (" + r.shortRegain + " au repos court)" : ""))),
+      pips(r.max, r.spent, "resource", { "data-id": r.id }, !isKeeper));
+    if (!isKeeper || r.spent < 1) return row;
+    const recovery = h("div", { class: "grave-recovery small-text" }, "Récupérer sans action avec un emplacement : ",
+        slots.length ? slots.map((sl) => h("button", { class: "small", "data-action": "restoreKeeperOfSouls", "data-level": sl.level,
+          disabled: incapacitated, title: incapacitated ? "Impossible en étant Neutralisé" : "Dépenser un emplacement de niveau " + sl.level }, "Niv. " + sl.level))
+          : h("span", { class: "muted" }, "aucun emplacement de niveau 6+ disponible"));
+    return h("div", { class: "resource-stack" }, row, recovery);
   }
   function resourcesCard(s) {
     const list = s.resources.filter((r) => !onCompanion(s, r));
@@ -328,7 +338,7 @@
       s.actions.map((a) => h("div", { class: "action" },
         h("div", null, h("b", null, a.name.fr), " ", h("span", { class: "tag" }, ACTION_TYPES[a.actionType] || a.actionType)),
         Array.isArray(a.description) ? traitList(a.description) : h("div", { class: "small-text" }, a.description))));
-  }
+  };
 
   // --- Onglet Sorts ---
   const CAST = { action: "1 action", bonus: "1 action bonus", reaction: "1 réaction" };
@@ -612,6 +622,7 @@
   }
 
   Object.assign(DND.app.actions, {
+    restoreKeeperOfSouls: (d) => DND.app.update((ch, s) => R.restoreKeeperOfSouls(ch, s, Number(d.level))),
     damage: () => { const v = DND.app.ui.amount; DND.app.ui.amount = ""; DND.app.update((ch, s) => R.damage(ch, s, v)); },
     heal: () => { const v = DND.app.ui.amount; DND.app.ui.amount = ""; DND.app.update((ch, s) => R.heal(ch, s, v)); },
     spendCoins: () => coinAction(R.spendCoins),

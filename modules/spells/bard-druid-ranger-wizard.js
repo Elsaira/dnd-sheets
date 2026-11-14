@@ -15,7 +15,7 @@
     S("animal-friendship", "Amitié avec les animaux", "Animal Friendship", 1, "enchantment", "action", 30, "V, S, M", "24 heures",
       ["bard", "druid", "ranger"], { save: "wis", material: "un peu de nourriture" }),
     S("goodberry", "Baies nourricières", "Goodberry", 1, "conjuration", "action", "self", "V, S, M", "24 heures",
-      ["druid", "ranger"], { material: "une branche de gui" }),
+      ["druid", "ranger"], { heal: { text: "1 PV par baie (10 baies)" }, material: "une branche de gui" }),
     S("entangle", "Enchevêtrement", "Entangle", 1, "conjuration", "action", 90, "V, S", "1 minute",
       ["druid", "ranger"], { concentration: true, save: "str" }),
     S("hail-of-thorns", "Grêle d'épines", "Hail of Thorns", 1, "conjuration", "bonus", "self", "V", "Instantanée",

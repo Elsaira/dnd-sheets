@@ -284,42 +284,12 @@
           h("td", null, a.range))))));
   }
 
-  const HEALING_SPELLS = new Set([
-    "cure-wounds", "healing-word", "prayer-of-healing", "aura-of-vitality", "mass-healing-word", "mass-cure-wounds",
-    "goodberry", "aid", "revivify", "raise-dead",
-  ]);
-  const isHealingSpell = (sp) => HEALING_SPELLS.has(sp.spell.id) || /soin|guérison|heal|cure/i.test(sp.spell.name.fr + " " + (sp.spell.name.en || ""));
   function supportSpellsCard(s) {
-    return spellListCard(s, "Sorts de soutien", s.spells.filter((sp) => !sp.spell.damage && !sp.spell.attack && !isHealingSpell(sp)), "support-spells-card");
+    return spellListCard(s, "Sorts de soutien", s.spells.filter((sp) => !sp.spell.damage && !sp.spell.attack && !sp.heal), "support-spells-card");
   }
 
   function healingSpellsCard(s) {
-    const healingSpells = s.spells.filter(isHealingSpell);
-    if (!healingSpells.length) return null;
-    return spellListCard(s, "Soins", healingSpells, "healing-spells-card");
-  }
-
-  const HEALING_VALUES = {
-    "cure-wounds": { dice: "2d8", modifier: true },
-    "healing-word": { dice: "2d4", modifier: true },
-    "prayer-of-healing": { dice: "2d8" },
-    "aura-of-vitality": { text: "2d6 par action bonus" },
-    "mass-healing-word": { dice: "2d4", modifier: true },
-    "mass-cure-wounds": { dice: "3d8", modifier: true },
-    goodberry: { text: "1 PV par baie (10 baies)" },
-    aid: { text: "+5 PV max et actuels par cible" },
-    revivify: { text: "1 PV" },
-    "raise-dead": { text: "1 PV" },
-  };
-  function healingValue(s, sp) {
-    const value = HEALING_VALUES[sp.spell.id];
-    if (!value) return null;
-    if (value.text) return value.text;
-    const modifier = value.modifier && sp.ability ? s.abilities[sp.ability].mod : 0;
-    let result = value.dice + (modifier ? E.signed(modifier) : "");
-    const upcast = sp.upcast && sp.upcast.summary.find((line) => line.startsWith("soins +"));
-    if (upcast) result += " (" + upcast.replace("soins +", "+") + ")";
-    return result + " PV";
+    return spellListCard(s, "Soins", s.spells.filter((sp) => sp.heal), "healing-spells-card");
   }
 
   function spellListCard(s, title, spells, className) {
@@ -329,12 +299,11 @@
       h("ul", { class: "support-spells" }, sorted.map((sp) => {
         const spell = sp.spell;
         const info = [spell.level ? "Niveau " + spell.level : "Tour de magie", E.range(spell.range), spell.duration].filter(Boolean).join(" · ");
-        const healing = className === "healing-spells-card" ? healingValue(s, sp) : null;
         return h("li", null,
           spell.custom ? h("b", null, spell.name.fr)
             : h("a", { href: DND.config.spellUrl(spell), target: "_blank", rel: "noopener", title: "EN : " + spell.name.en + " · description complète sur AideDD" }, spell.name.fr),
           h("span", { class: "small-text muted" }, info + (spell.concentration ? " · Concentration" : "")),
-          healing ? h("b", { class: "healing-value" }, healing) : null);
+          sp.heal ? h("b", { class: "healing-value" }, sp.heal) : null);
       })));
   }
 

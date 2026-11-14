@@ -1,5 +1,9 @@
 # Journal de développement : fiches D&D 5.5 (règles 2024)
 
+## 2026-11-14 : Sorts de soin hors du noyau
+
+Les listes `HEALING_SPELLS` / `HEALING_VALUES` quittent `core/view-play.js`. Chaque sort porte son champ `heal` (`{ dice, mod: true }` ou `{ text }`) dans `modules/spells/` ; le moteur calcule `sp.heal` (dés + modificateur d'incantation, + dés de l'emplacement de pacte) et la carte « Soins » liste les sorts qui en ont un. Plus de détection par le nom du sort.
+
 ## 2026-11-14 : AGENTS.md pour les autres IA
 
 AGENTS.md décrit les règles du projet pour toute IA qui modifie le dépôt : aucun code propre à une classe dans `core/` (option générique côté noyau, données dans `modules/`), organisation des fichiers, style, sources de règles, vérifications avant chaque commit.

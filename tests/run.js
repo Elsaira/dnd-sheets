@@ -194,6 +194,18 @@ eq("Sort d'un lanceur à emplacements normaux : texte seul", E.upcast(DND.data.s
   eq("Concentration : emplacement de pacte", E.concentrationInfo({ spells: [{ spell: DND.data.spells["hex"], upcast: E.upcast(DND.data.spells["hex"], 5) }], spellSlots: [], pact: { level: 5 } }, { concentration: "Maléfice" }), { duration: "24 heures", level: 5, levels: [], noConcentration: false });
   eq("Concentration : sort inconnu", E.concentrationInfo(sh, { concentration: "Truc" }), null);
 }
+{
+  const c = E.newCharacter();
+  c.abilities.wis = 16;
+  c.classes = [{ id: "cleric", level: 5, subclass: "", choices: {} }];
+  c.spells = ["cure-wounds", "prayer-of-healing", "aid", "bless"].map((id) => ({ id, source: "cleric" }));
+  const sp = E.compute(c).spells;
+  eq("Soins : valeur calculée sur le sort", ["cure-wounds", "prayer-of-healing", "aid", "bless"].map((id) => sp.find((x) => x.spell.id === id).heal), ["2d8+3 PV", "2d8 PV", "+5 PV max et actuels par cible", undefined]);
+  const w = E.newCharacter();
+  w.abilities.cha = 18;
+  w.classes = [{ id: "warlock", level: 5, subclass: "celestial", choices: {} }];
+  eq("Soins : emplacement de pacte niv. 3", E.compute(w).spells.find((x) => x.spell.id === "cure-wounds").heal, "2d8+4 (+4d8) PV");
+}
 eq("Image majeure niv. 4 sans concentration", E.upcast(DND.data.spells["major-image"], 4).noConcentration, true);
 eq("Maléfice niv. 2", E.upcast(DND.data.spells.hex, 2).summary, ["durée jusqu'à 4 heures"]);
 eq("Armure d'Agathys niv. 3", E.upcast(DND.data.spells["armor-of-agathys"], 3).summary, ["15 PV temporaires et dégâts de froid"]);

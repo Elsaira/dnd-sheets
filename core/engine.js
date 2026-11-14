@@ -615,6 +615,7 @@
         attack: ability ? pb + mod[ability] + bonus("spellAttack") - sheet.d20Penalty : null };
       const up = E.upcast(spell, slotLevel);
       if (up) out.upcast = up;
+      if (spell.heal) out.heal = spell.heal.text || spell.heal.dice + (spell.heal.mod && ability && mod[ability] ? E.signed(mod[ability]) : "") + (up && up.heal ? " (+" + up.heal + ")" : "") + " PV";
       if (spell.damage) {
         const extra = bonus("spellDamage." + spell.id);
         const type = " " + DND.label(spell.damage.type).toLowerCase();
@@ -679,7 +680,7 @@
       out.dice = times(u.dice, n);
       if (!spell.damage) out.summary.push("dégâts +" + out.dice);
     }
-    if (u.heal) out.summary.push("soins +" + times(u.heal, n));
+    if (u.heal) { out.heal = times(u.heal, n); out.summary.push("soins +" + out.heal); }
     if (u.targets) out.summary.push("+" + u.targets * n + " cible" + (u.targets * n > 1 ? "s" : ""));
     if (u.amount) out.summary.push((u.amount.base ? "" : "+") + String((u.amount.base || 0) + u.amount.each * n).replace(".", ",") + " " + u.amount.label);
     if (u.duration) {

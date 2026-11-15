@@ -1,5 +1,9 @@
 # Journal de développement : fiches D&D 5.5 (règles 2024)
 
+## 2026-11-15 : Rouerie magique et Réserve arcanique automatiques
+
+Nouvelles options génériques de l'effet `resource` : `pactRegain: 0.5` (part des emplacements de pacte rendue, arrondie au supérieur ; bouton « Utiliser : +N emplacement(s) de pacte », `R.regainPact`), `slotCreate: { niveau: coût }` (boutons « Créer », dépense les points et ajoute un emplacement créé, `R.createSlot`) et `slotConvert: true` (boutons « Convertir », dépense un emplacement et rend autant de points que son niveau dans la limite du maximum, `R.convertSlot`). Occultiste : Rouerie magique ; Ensorceleur : Points de sorcellerie. L'Ensorceleur perd l'effet `extraSlots` (le + gratuit) ; le − des emplacements créés reste toujours disponible. 509 tests.
+
 ## 2026-11-15 : Copier les jets pour le bot Discord
 
 Le groupe lance les dés avec un bot Discord. Chaque jet de la fiche (tests et JS de caractéristique, compétences, initiative, attaques) a trois petits boutons N / A / D qui copient `/roll 1d20+x`, `/roll 2d20k1+x` ou `/roll 2d20kl1+x` (`E.rollCommand`) ; les dés des dégâts se cliquent aussi (`E.diceIn` : premier « XdY±n » du texte, « 2 rayons de 1d10 » copie `/roll 1d10`). Boutons masqués jusqu'au survol (toujours visibles sur écran tactile) ; A ou D coloré quand la fiche connaît un avantage ou un désavantage. Retour « Copié : … » 2 s (`App.toast` accepte une durée). Validé par Plouf sur captures. 501 tests.

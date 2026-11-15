@@ -37,8 +37,8 @@
 
   // Création d'emplacements : niveau d'emplacement -> [coût, niveau d'ensorceleur minimum]
   const SLOT_COST = { 1: [2, 2], 2: [3, 3], 3: [5, 5], 4: [6, 7], 5: [7, 9] };
-  const slotCosts = (c) => Object.entries(SLOT_COST).filter(([, [, min]]) => lvl(c) >= min)
-    .map(([slot, [cost]]) => "niv. " + slot + " : " + cost + " pts").join(", ");
+  const slotCreate = (c) => Object.fromEntries(Object.entries(SLOT_COST).filter(([, [, min]]) => lvl(c) >= min).map(([slot, [cost]]) => [slot, cost]));
+  const slotCosts = (c) => Object.entries(slotCreate(c)).map(([slot, cost]) => "niv. " + slot + " : " + cost + " pts").join(", ");
 
   registerModule({
     kind: "class", id: "sorcerer",
@@ -72,12 +72,12 @@
         description: "Points de sorcellerie égaux à votre niveau d'ensorceleur, récupérés au repos long. Convertir un emplacement en points (autant que son niveau, sans action) ; créer un emplacement (action bonus, niveau 5 maximum) : niveau 1 = 2 pts, 2 = 3 pts, 3 = 5 pts (niv. 5), 4 = 6 pts (niv. 7), 5 = 7 pts (niv. 9). Les emplacements créés disparaissent au repos long.",
         effects: [
           { type: "resource", id: "sorceryPoints", name: { fr: "Points de sorcellerie", en: "Sorcery Points" }, max: (c) => lvl(c), recharge: "long",
+            slotCreate, slotConvert: true,
             description: "Métamagie, création d'emplacements, etc." },
           { type: "action", name: { fr: "Convertir un emplacement", en: "Converting Spell Slots" }, actionType: "free", ...sp,
-            description: "Dépensez un emplacement de sort : gagnez autant de points de sorcellerie que son niveau (dans la limite du maximum)." },
+            description: "Dépensez un emplacement de sort : gagnez autant de points de sorcellerie que son niveau (dans la limite du maximum). Boutons « Convertir » sous les points de sorcellerie." },
           { type: "action", name: { fr: "Créer un emplacement", en: "Creating Spell Slots" }, actionType: "bonus", ...sp,
-            description: (c) => "Transformez des points en emplacement (" + slotCosts(c) + "). Il disparaît au repos long. Bouton + de la carte Emplacements de sorts." },
-          { type: "extraSlots", maxLevel: (c) => DND.byLevel({ 2: 1, 3: 2, 5: 3, 7: 4, 9: 5 }, lvl(c)) },
+            description: (c) => "Transformez des points en emplacement (" + slotCosts(c) + "). Il disparaît au repos long. Boutons « Créer » sous les points de sorcellerie." },
         ] },
       { level: 2, id: "metamagic", name: { fr: "Métamagie", en: "Metamagic" },
         description: "Deux options de Métamagie (4 au niveau 10, 6 au niveau 17), une seule par sort sauf mention contraire. À chaque niveau, vous pouvez en remplacer une.",

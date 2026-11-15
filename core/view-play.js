@@ -350,14 +350,29 @@
       h("div", { class: "res-name" }, r.name.fr, h("small", { class: "muted" },
         " · " + RECHARGE[r.recharge] + (r.shortRegain ? " (" + r.shortRegain + " au repos court)" : ""))),
       pips(r.max, r.spent, "resource", { "data-id": r.id }));
-    if (!r.slotRegain || r.spent < 1) return row;
-    const slots = DND.app.sheet.spellSlots.filter((sl) => sl.level >= r.slotRegain && sl.spent < sl.max);
-    const blocked = r.blockedBy && DND.app.ch.state.conditions.includes(r.blockedBy);
-    return h("div", { class: "resource-stack" }, row,
-      h("div", { class: "slot-regain small-text" }, "Récupérer avec un emplacement : ",
-        slots.length ? slots.map((sl) => h("button", { class: "small", "data-action": "regainWithSlot", "data-id": r.id, "data-level": sl.level,
-          disabled: blocked, title: blocked ? "Impossible en étant " + DND.label("condition." + r.blockedBy) : "Dépenser un emplacement de niveau " + sl.level }, "Niv. " + sl.level))
-          : h("span", { class: "muted" }, "aucun emplacement de niveau " + r.slotRegain + "+ disponible")));
+    const s = DND.app.sheet, left = r.max - r.spent, lines = [];
+    const btn = (action, level, label, title, disabled) => h("button", { class: "small", "data-action": action, "data-id": r.id, "data-level": level, title, disabled }, label);
+    if (r.slotRegain && r.spent > 0) {
+      const slots = s.spellSlots.filter((sl) => sl.level >= r.slotRegain && sl.spent < sl.max);
+      const blocked = r.blockedBy && DND.app.ch.state.conditions.includes(r.blockedBy);
+      lines.push(["Récupérer avec un emplacement : ", slots.length ? slots.map((sl) => btn("regainWithSlot", sl.level, "Niv. " + sl.level,
+        blocked ? "Impossible en étant " + DND.label("condition." + r.blockedBy) : "Dépenser un emplacement de niveau " + sl.level, blocked))
+        : h("span", { class: "muted" }, "aucun emplacement de niveau " + r.slotRegain + "+ disponible")]);
+    }
+    if (r.pactRegain && s.pact) {
+      const n = Math.min(r.pactRegain, s.pact.spent);
+      lines.push([btn("regainPact", 0, n ? "Utiliser : +" + n + " emplacement" + (n > 1 ? "s" : "") + " de pacte" : "Aucun emplacement de pacte dépensé",
+        "Récupère jusqu'à " + r.pactRegain + " emplacement(s) de Magie de pacte dépensé(s)", !n || !left)]);
+    }
+    if (r.slotCreate) lines.push(["Créer : ", Object.entries(r.slotCreate).map(([lv, cost]) =>
+      btn("createSlot", lv, "Niv. " + lv + " (" + cost + ")", "Dépenser " + cost + " points : emplacement de niveau " + lv + ", perdu au repos long", left < cost))]);
+    if (r.slotConvert) {
+      const slots = s.spellSlots.filter((sl) => sl.spent < sl.max);
+      lines.push(["Convertir : ", slots.length ? slots.map((sl) => btn("convertSlot", sl.level, "Niv. " + sl.level + " → +" + Math.min(sl.level, r.spent),
+        "Dépenser un emplacement de niveau " + sl.level + " pour récupérer des points", !r.spent))
+        : h("span", { class: "muted" }, "aucun emplacement disponible")]);
+    }
+    return lines.length ? h("div", { class: "resource-stack" }, row, lines.map((l) => h("div", { class: "slot-regain small-text" }, l))) : row;
   }
   function resourcesCard(s) {
     const list = s.resources.filter((r) => !onCompanion(s, r));
@@ -670,6 +685,9 @@
   }
 
   Object.assign(DND.app.actions, {
+    regainPact: (d) => DND.app.update((ch, s) => R.regainPact(ch, s, d.id)),
+    createSlot: (d) => DND.app.update((ch, s) => R.createSlot(ch, s, d.id, Number(d.level))),
+    convertSlot: (d) => DND.app.update((ch, s) => R.convertSlot(ch, s, d.id, Number(d.level))),
     regainWithSlot: (d) => DND.app.update((ch, s) => R.regainWithSlot(ch, s, d.id, Number(d.level))),
     damage: () => { const v = DND.app.ui.amount; DND.app.ui.amount = ""; DND.app.update((ch, s) => R.damage(ch, s, v)); },
     heal: () => { const v = DND.app.ui.amount; DND.app.ui.amount = ""; DND.app.update((ch, s) => R.heal(ch, s, v)); },

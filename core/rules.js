@@ -135,6 +135,39 @@
     return r.name.fr + " récupéré : emplacement de niveau " + level + " dépensé.";
   };
 
+  const blockedMsg = (ch, r) => r.blockedBy && ch.state.conditions.includes(r.blockedBy) && r.name.fr + " : impossible en étant " + DND.label("condition." + r.blockedBy) + ".";
+
+  R.regainPact = function (ch, sheet, id) {
+    const r = sheet.resources.find((x) => x.id === id);
+    if (!r || !r.pactRegain || r.spent >= r.max) return;
+    const n = Math.min(r.pactRegain, sheet.pact.spent);
+    if (!n) return "Aucun emplacement de pacte dépensé.";
+    const b = blockedMsg(ch, r);
+    if (b) return b;
+    ch.state.pactSpent = sheet.pact.spent - n;
+    ch.state.resources[id] = r.spent + 1;
+    return r.name.fr + " : " + n + " emplacement" + (n > 1 ? "s" : "") + " de pacte récupéré" + (n > 1 ? "s" : "") + ".";
+  };
+
+  R.createSlot = function (ch, sheet, id, level) {
+    const r = sheet.resources.find((x) => x.id === id);
+    const cost = r && r.slotCreate && r.slotCreate[level];
+    if (!cost) return;
+    if (r.max - r.spent < cost) return "Il faut " + cost + " " + r.name.fr.toLowerCase() + ".";
+    ch.state.resources[id] = r.spent + cost;
+    ch.state.slotsExtra[level] = (ch.state.slotsExtra[level] || 0) + 1;
+    return "Emplacement de niveau " + level + " créé (−" + cost + ").";
+  };
+
+  R.convertSlot = function (ch, sheet, id, level) {
+    const r = sheet.resources.find((x) => x.id === id);
+    const slot = sheet.spellSlots.find((x) => x.level === level);
+    if (!r || !r.slotConvert || !slot || slot.spent >= slot.max || !r.spent) return;
+    ch.state.slotsSpent[level] = slot.spent + 1;
+    ch.state.resources[id] = Math.max(0, r.spent - level);
+    return "Emplacement de niveau " + level + " converti (+" + Math.min(level, r.spent) + ").";
+  };
+
   R.useSlot = function (ch, sheet, level, delta) {
     const slot = sheet.spellSlots.find((s) => s.level === level);
     if (!slot) return;
@@ -142,8 +175,8 @@
   };
 
   R.addSlot = function (ch, sheet, level, delta) {
-    if (level < 1 || level > sheet.extraSlots) return;
     const x = ch.state.slotsExtra;
+    if (level < 1 || (delta > 0 && level > sheet.extraSlots)) return;
     x[level] = Math.max(0, (x[level] || 0) + delta);
   };
 

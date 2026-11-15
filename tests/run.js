@@ -516,6 +516,7 @@ R.createSlot(ch, s, spId, 3);
 s = E.compute(ch);
 eq("Ensorceleur 5 : emplacement niv. 3 créé pour 5 points", [s.spellSlots.map((x) => x.max), s.spellSlots[2].extra, s.resources.find((r) => r.id === spId).spent], [[4, 3, 3], 1, 5]);
 eq("Création sans points : refusée", /Il faut 2/.test(R.createSlot(ch, s, spId, 1)), true);
+eq("Unité des points", [R.qty(1, s.resources.find((r) => r.id === spId)), R.qty(5, s.resources.find((r) => r.id === spId))], ["1 pt", "5 pts"]);
 R.convertSlot(ch, s, spId, 2);
 s = E.compute(ch);
 eq("Conversion niv. 2 : +2 points, emplacement dépensé", [s.resources.find((r) => r.id === spId).spent, s.spellSlots[1].spent], [3, 1]);

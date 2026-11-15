@@ -72,7 +72,7 @@
         description: "Points de sorcellerie égaux à votre niveau d'ensorceleur, récupérés au repos long. Convertir un emplacement en points (autant que son niveau, sans action) ; créer un emplacement (action bonus, niveau 5 maximum) : niveau 1 = 2 pts, 2 = 3 pts, 3 = 5 pts (niv. 5), 4 = 6 pts (niv. 7), 5 = 7 pts (niv. 9). Les emplacements créés disparaissent au repos long.",
         effects: [
           { type: "resource", id: "sorceryPoints", name: { fr: "Points de sorcellerie", en: "Sorcery Points" }, max: (c) => lvl(c), recharge: "long",
-            slotCreate, slotConvert: true,
+            slotCreate, slotConvert: true, unit: ["pt", "pts"],
             description: "Métamagie, création d'emplacements, etc." },
           { type: "action", name: { fr: "Convertir un emplacement", en: "Converting Spell Slots" }, actionType: "free", ...sp,
             description: "Dépensez un emplacement de sort : gagnez autant de points de sorcellerie que son niveau (dans la limite du maximum). Boutons « Convertir » sous les points de sorcellerie." },

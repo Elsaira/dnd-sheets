@@ -366,15 +366,16 @@
     }
     if (r.restores && !r.restores.shortRest) lines.push([restoreButton(s, r)]);
     if (r.slotCreate) lines.push(["Créer : ", Object.entries(r.slotCreate).map(([lv, cost]) =>
-      btn("createSlot", lv, "Niv. " + lv + " (" + cost + ")", "Dépenser " + cost + " points : emplacement de niveau " + lv + ", perdu au repos long", left < cost))]);
+      btn("createSlot", lv, "Niv. " + lv + " (" + qty(cost, r) + ")", "Dépenser " + qty(cost, r) + " : emplacement de niveau " + lv + ", perdu au repos long", left < cost))]);
     if (r.slotConvert) {
       const slots = s.spellSlots.filter((sl) => sl.spent < sl.max);
-      lines.push(["Convertir : ", slots.length ? slots.map((sl) => btn("convertSlot", sl.level, "Niv. " + sl.level + " → +" + sl.level,
+      lines.push(["Convertir : ", slots.length ? slots.map((sl) => btn("convertSlot", sl.level, "Niv. " + sl.level + " → +" + qty(sl.level, r),
         "Dépenser un emplacement de niveau " + sl.level + " pour gagner " + sl.level + " points (sans dépasser le maximum)", !r.spent))
         : h("span", { class: "muted" }, "aucun emplacement disponible")]);
     }
     return lines.length ? h("div", { class: "resource-stack" }, row, lines.map((l) => h("div", { class: "slot-regain small-text" }, l))) : row;
   }
+  const qty = R.qty;
   function restoreButton(s, r) {
     const t = s.resources.find((x) => x.id === r.restores.id);
     const n = t ? Math.min(r.restores.amount, t.spent) : 0;

@@ -149,6 +149,8 @@
     return r.name.fr + " : " + n + " emplacement" + (n > 1 ? "s" : "") + " de pacte récupéré" + (n > 1 ? "s" : "") + ".";
   };
 
+  R.qty = (n, r) => n + (r.unit ? " " + r.unit[n > 1 ? 1 : 0] : "");
+
   R.restoreResource = function (ch, sheet, id) {
     const r = sheet.resources.find((x) => x.id === id);
     const t = r && r.restores && sheet.resources.find((x) => x.id === r.restores.id);
@@ -169,7 +171,7 @@
     if (r.max - r.spent < cost) return "Il faut " + cost + " " + r.name.fr.toLowerCase() + ".";
     ch.state.resources[id] = r.spent + cost;
     ch.state.slotsExtra[level] = (ch.state.slotsExtra[level] || 0) + 1;
-    return "Emplacement de niveau " + level + " créé (−" + cost + ").";
+    return "Emplacement de niveau " + level + " créé (−" + R.qty(cost, r) + ").";
   };
 
   R.convertSlot = function (ch, sheet, id, level) {
@@ -178,7 +180,7 @@
     if (!r || !r.slotConvert || !slot || slot.spent >= slot.max || !r.spent) return;
     ch.state.slotsSpent[level] = slot.spent + 1;
     ch.state.resources[id] = Math.max(0, r.spent - level);
-    return "Emplacement de niveau " + level + " converti (+" + Math.min(level, r.spent) + ").";
+    return "Emplacement de niveau " + level + " converti (+" + R.qty(Math.min(level, r.spent), r) + ").";
   };
 
   R.useSlot = function (ch, sheet, level, delta) {

@@ -8,6 +8,10 @@ Signalé par Plouf : la pastille de Stabilisation restait « Action » pour le D
 
 Dice Maiden (github.com/Humblemonk/dicemaiden-rs) n'accepte que la commande slash tapée : coller « /roll … » ne marche pas. Les boutons copient maintenant seulement l'expression (`1d20-1`, `2d20 k1+5`, `2d20 kl1+5`, `1d4+2`) à coller dans la case « dice » après avoir tapé /roll. Syntaxe k1/kl1 vérifiée dans roll_syntax.md du bot (alias `+d20` → `2d20 k1`, espace avant k comme dans sa doc). 511 tests.
 
+## 2026-11-15 : Unité des points de sorcellerie
+
+Option générique `unit: ["pt", "pts"]` sur l'effet `resource` (`R.qty`) : les boutons Créer et Convertir et les messages affichent « (2 pts) », « +1 pt » au lieu d'un nombre seul. Demande de Plouf.
+
 ## 2026-11-15 : Rouerie magique et Réserve arcanique automatiques
 
 Nouvelles options génériques de l'effet `resource` : `pactRegain: 0.5` (part des emplacements de pacte rendue, arrondie au supérieur ; bouton « Utiliser : +N emplacement(s) de pacte », `R.regainPact`), `slotCreate: { niveau: coût }` (boutons « Créer », dépense les points et ajoute un emplacement créé, `R.createSlot`) et `slotConvert: true` (boutons « Convertir », dépense un emplacement et rend autant de points que son niveau dans la limite du maximum, `R.convertSlot`). Occultiste : Rouerie magique ; Ensorceleur : Points de sorcellerie. Option `restores: { id, amount, shortRest }` : utiliser la ressource rend `amount` utilisations d'une autre ressource de la même source (`R.restoreResource`) ; avec `shortRest: true`, le bouton n'apparaît que dans la fenêtre Repos court (Restauration ensorcelée, moitié du niveau arrondie à l'inférieur). Le bouton Convertir affiche le vrai gain (+niveau), plafonné au maximum. L'Ensorceleur perd l'effet `extraSlots` (le + gratuit) ; le − des emplacements créés reste toujours disponible. 511 tests.

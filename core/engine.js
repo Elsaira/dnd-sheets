@@ -480,7 +480,7 @@
         max, spent: Math.min(max, ch.state.resources[id] || 0), recharge: val(e.recharge, x) || "long", // recharge peut dépendre du niveau : { 1: "long", 5: "short" }
         shortRegain: e.shortRegain, slotRegain: e.slotRegain, blockedBy: e.blockedBy,
         pactRegain: e.pactRegain && sheet.pact ? Math.ceil(sheet.pact.count * e.pactRegain) : 0,
-        slotCreate: typeof e.slotCreate === "function" ? e.slotCreate(c, x.level) : e.slotCreate, slotConvert: e.slotConvert,
+        slotCreate: typeof e.slotCreate === "function" ? e.slotCreate(c, x.level) : e.slotCreate, slotConvert: e.slotConvert, unit: e.unit,
         restores: e.restores && { id: x.source.id + "." + e.restores.id, amount: Number(val(e.restores.amount, x)) || 0, shortRest: e.restores.shortRest }, display: e.display, companion: e.companion, source: x.source.label });
     }
     for (const sp of sheet.spells) {

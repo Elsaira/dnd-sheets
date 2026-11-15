@@ -10,10 +10,10 @@
   E.profBonus = (level) => 2 + Math.floor((Math.max(1, level) - 1) / 4);
   E.totalLevel = (ch) => ch.classes.reduce((sum, c) => sum + (Number(c.level) || 0), 0);
   E.signed = (n) => (n >= 0 ? "+" : "−") + Math.abs(n);
-  E.rollCommand = (bonus, mode) => "/roll " + ({ adv: "2d20k1", dis: "2d20kl1" }[mode] || "1d20") + (bonus ? (bonus > 0 ? "+" : "-") + Math.abs(bonus) : "");
+  E.rollCommand = (bonus, mode) => ({ adv: "2d20 k1", dis: "2d20 kl1" }[mode] || "1d20") + (bonus ? (bonus > 0 ? "+" : "-") + Math.abs(bonus) : "");
   E.diceIn = (text) => {
     const m = /\d+d\d+(\s*[+−-]\s*\d+)?/.exec(text || "");
-    return m && { index: m.index, text: m[0], command: "/roll " + m[0].replace(/−/g, "-").replace(/\s/g, "") };
+    return m && { index: m.index, text: m[0], command: m[0].replace(/−/g, "-").replace(/\s/g, "") };
   };
 
   // ---------------------------------------------------------------------------

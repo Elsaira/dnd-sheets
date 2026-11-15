@@ -26,10 +26,10 @@
     App.render();
   };
   let toastTimer;
-  App.toast = function (text, silent) {
+  App.toast = function (text, silent, ms) {
     App.ui.toast = text;
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => App.setUi({ toast: "" }), 6000);
+    toastTimer = setTimeout(() => App.setUi({ toast: "" }), ms || 6000);
     if (!silent) App.render();
   };
 
@@ -188,6 +188,13 @@
     closeModal: () => App.setUi({ modal: null }),
     closeModalBackdrop: (d, el, ev) => { if (ev.target === el) App.setUi({ modal: null }); },
     closeToast: () => App.setUi({ toast: "" }),
+    roll: (d, el) => {
+      const fallback = () => { const t = document.createElement("textarea"); t.value = d.roll; document.body.append(t); t.select(); document.execCommand("copy"); t.remove(); };
+      try { navigator.clipboard.writeText(d.roll).catch(fallback); } catch (e) { fallback(); }
+      App.toast("Copié : " + d.roll, false, 2000);
+      el.classList.add("copied");
+      setTimeout(() => el.classList.remove("copied"), 800);
+    },
     setAccentPreset: (d, value) => {
       if (value === "custom") return;
       const p = DND.data.accentPresets.find((x) => x.id === value);

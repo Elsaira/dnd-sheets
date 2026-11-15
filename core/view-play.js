@@ -6,6 +6,14 @@
   DND.views = DND.views || {};
   const sg = E.signed;
   const en = (text) => (text ? "EN : " + text : null);
+  const rollCmd = (bonus, i) => "/roll " + ["1d20", "2d20k1", "2d20kl1"][i] + (bonus ? (bonus > 0 ? "+" : "-") + Math.abs(bonus) : "");
+  const rolls = (bonus, label, hint) => h("span", { class: "rolls" }, ["N", "A", "D"].map((t, i) =>
+    h("button", { class: ["roll", "roll-" + t, hint === t && "hint"], "data-action": "roll", "data-roll": rollCmd(bonus, i),
+      title: label + " " + ["normal", "avec avantage", "avec désavantage"][i] + " : copier « " + rollCmd(bonus, i) + " »" }, t)));
+  const damageRoll = (text, label) => {
+    const m = /^\d+d\d+(\s*[+−-]\s*\d+)?/.exec(text || "");
+    return m ? h("button", { class: "roll-dmg", "data-action": "roll", "data-roll": "/roll " + m[0].replace(/−/g, "-").replace(/\s/g, ""), title: "Dégâts de " + label + " : copier « /roll " + m[0].replace(/−/g, "-").replace(/\s/g, "") + " »" }, text) : text;
+  };
 
   DND.views.play = function (App) {
     const s = App.sheet, ch = App.ch;
@@ -37,8 +45,10 @@
         h("div", { class: "ab-name" }, l.short),
         h("div", { class: "ab-mod" }, sg(ab.mod)),
         h("div", { class: "ab-score" }, ab.score),
+        rolls(ab.mod, "Test de " + l.fr),
         h("div", { class: ["ab-save", "ability-color", "ability-" + a, ab.save.proficient && "prof"], title: "Jet de sauvegarde" + (ab.save.advantage.length ? " · avantage : " + ab.save.advantage.join(", ") : "") },
-          h("span", { class: "dot" }), "JS ", sg(ab.save.bonus), ab.save.advantage.length ? h("span", { class: "adv" }, " A") : null));
+          h("span", { class: "dot" }), "JS ", sg(ab.save.bonus), ab.save.advantage.length ? h("span", { class: "adv" }, " A") : null),
+        rolls(ab.save.bonus, "JS de " + l.fr, ab.save.advantage.length ? "A" : null));
     }));
   }
 
@@ -54,7 +64,8 @@
           return h("li", { title: en(def.en) + (sk.advantage.length ? " · avantage : " + sk.advantage.join(", ") : "") },
             h("span", { class: ["dot", sk.prof === 1 && "prof", sk.prof === 2 && "expert"] }),
             h("span", { class: "sk-name" }, def.fr),
-            h("span", { class: "sk-bonus" }, sg(sk.bonus), id === "stealth" && s.stealthDisadvantage ? h("span", { class: "dis", title: "Désavantage (armure)" }, " D") : null));
+            h("span", { class: "sk-bonus" }, sg(sk.bonus), id === "stealth" && s.stealthDisadvantage ? h("span", { class: "dis", title: "Désavantage (armure)" }, " D") : null),
+            rolls(sk.bonus, def.fr, id === "stealth" && s.stealthDisadvantage ? "D" : sk.advantage.length ? "A" : null));
         })))));
   }
 
@@ -82,7 +93,7 @@
     const speeds = Object.entries(s.speed).filter(([, v]) => v > 0);
     return h("section", { class: "strip" },
       stat("CA", s.ac.value, s.ac.parts.map((p) => p.label + " " + p.value).join(" · ")),
-      stat("Initiative", sg(s.initiative.bonus), s.initiative.advantage.length ? "Avantage : " + s.initiative.advantage.join(", ") : null),
+      stat("Initiative", [sg(s.initiative.bonus), rolls(s.initiative.bonus, "Initiative", s.initiative.advantage.length ? "A" : null)], s.initiative.advantage.length ? "Avantage : " + s.initiative.advantage.join(", ") : null),
       stat("Vitesse", E.meters(s.speed.walk), speeds.map(([k, v]) => DND.label("speed." + k) + " " + E.meters(v)).join(" · ")),
       stat("Maîtrise", sg(s.pb), "Bonus de maîtrise"),
       stat("Taille", DND.label("size." + s.size)),
@@ -280,8 +291,8 @@
             a.kind === "weapon" && !a.proficient ? h("span", { class: "tag warn", title: "Arme non maîtrisée" }, "non maîtrisée") : null,
             a.bond ? h("span", { class: "tag", title: a.bond }, s.weaponBond ? s.weaponBond.column : "Pacte") : null,
             a.option ? h("span", { class: "tag", title: "Dégâts et caractéristique calculés avec " + a.option }, a.option) : null),
-          h("td", null, a.toHit != null ? sg(a.toHit) : a.save ? h("span", { class: ["ability-color", "ability-" + a.save.ability] }, "JS " + DND.data.labels[a.save.ability].short + " " + a.save.dc) : "—"),
-          h("td", null, a.damage, a.alt ? h("small", { class: "muted" }, " (" + a.alt + ")") : null),
+          h("td", null, a.toHit != null ? [sg(a.toHit), rolls(a.toHit, "Attaque " + a.name)] : a.save ? h("span", { class: ["ability-color", "ability-" + a.save.ability] }, "JS " + DND.data.labels[a.save.ability].short + " " + a.save.dc) : "—"),
+          h("td", null, damageRoll(a.damage, a.name), a.alt ? h("small", { class: "muted" }, " (", damageRoll(a.alt, a.name), ")") : null),
           h("td", null, a.range))))));
   }
 

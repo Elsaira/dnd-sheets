@@ -95,7 +95,15 @@ html.paper .ability.ability-color { border-top-color: var(--ability-color); }
 .skills { list-style: none; margin: 0; padding: 0; }
 .skills li { display: flex; align-items: center; padding: .12rem 0; border-bottom: 1px dashed var(--border); }
 .skills li:last-child { border-bottom: none; }
-.sk-name { flex: 1; } .sk-bonus { font-weight: 600; min-width: 2.4rem; text-align: right; }
+.sk-name { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .skills .dot { flex-shrink: 0; } .sk-bonus { font-weight: 600; min-width: 2.4rem; text-align: right; }
+.rolls { display: inline-flex; flex-shrink: 0; gap: 1px; margin-left: .25rem; vertical-align: middle; }
+.ability .rolls, .stat .rolls { display: flex; justify-content: center; margin: .15rem 0 0; }
+.roll { font-family: inherit; font-size: .62rem; font-weight: 600; line-height: 1; padding: .1rem .14rem; min-width: .9rem; border-radius: 3px; background: var(--panel-2); color: var(--muted); }
+.roll-A.hint { color: var(--good); border-color: var(--good); } .roll-D.hint { color: var(--bad); border-color: var(--bad); }
+.roll.copied, .roll-dmg.copied { background: var(--accent); color: var(--accent-text); border-color: var(--accent); }
+.roll-dmg { font: inherit; padding: 0 .15rem; border: 1px dashed transparent; background: none; color: inherit; text-align: left; }
+.roll-dmg:hover { border-color: var(--accent); }
+.skills .rolls, .attacks .rolls { opacity: .45; } .skills li:hover .rolls, .attacks tr:hover .rolls, .rolls:focus-within { opacity: 1; }
 .kv { display: flex; justify-content: space-between; padding: .1rem 0; }
 
 .strip { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: .7rem; }

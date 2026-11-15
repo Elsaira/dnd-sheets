@@ -11,8 +11,10 @@
     h("button", { class: ["roll", "roll-" + t, hint === t && "hint"], "data-action": "roll", "data-roll": rollCmd(bonus, i),
       title: label + " " + ["normal", "avec avantage", "avec désavantage"][i] + " : copier « " + rollCmd(bonus, i) + " »" }, t)));
   const damageRoll = (text, label) => {
-    const m = /^\d+d\d+(\s*[+−-]\s*\d+)?/.exec(text || "");
-    return m ? h("button", { class: "roll-dmg", "data-action": "roll", "data-roll": "/roll " + m[0].replace(/−/g, "-").replace(/\s/g, ""), title: "Dégâts de " + label + " : copier « /roll " + m[0].replace(/−/g, "-").replace(/\s/g, "") + " »" }, text) : text;
+    const m = /\d+d\d+(\s*[+−-]\s*\d+)?/.exec(text || "");
+    if (!m) return text;
+    const cmd = "/roll " + m[0].replace(/−/g, "-").replace(/\s/g, "");
+    return [text.slice(0, m.index), h("button", { class: "roll-dmg", "data-action": "roll", "data-roll": cmd, title: "Dégâts de " + label + " : copier « " + cmd + " »" }, m[0]), text.slice(m.index + m[0].length)];
   };
 
   DND.views.play = function (App) {

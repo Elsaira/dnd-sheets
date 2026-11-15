@@ -46,6 +46,14 @@ eq("Épée longue à 2 mains", s.attacks[0].alt, "1d10+3 à 2 mains");
 eq("Langue commune", s.proficiencies.languages.includes("language.common"), true);
 eq("Choix restants (langues)", s.pendingChoices, 1);
 eq("Pas d'erreur", s.errors, []);
+eq("Jet normal", E.rollCommand(5), "/roll 1d20+5");
+eq("Jet avec avantage", E.rollCommand(5, "adv"), "/roll 2d20k1+5");
+eq("Jet avec désavantage, bonus négatif", E.rollCommand(-1, "dis"), "/roll 2d20kl1-1");
+eq("Jet sans bonus", E.rollCommand(0), "/roll 1d20");
+eq("Dés des dégâts d'arme", E.diceIn(s.attacks[0].damage).command, "/roll 1d8+3");
+eq("Dés dans un texte", E.diceIn("2 rayons de 1d10 force").command, "/roll 1d10");
+eq("Modificateur négatif", E.diceIn("1d6 − 1 contondant").command, "/roll 1d6-1");
+eq("Pas de dés", E.diceIn("0 contondant"), null);
 
 // 2. Montée de niveau, don au niveau 4, sous-classe
 ch.classes[0].level = 4;

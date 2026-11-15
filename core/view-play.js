@@ -6,15 +6,12 @@
   DND.views = DND.views || {};
   const sg = E.signed;
   const en = (text) => (text ? "EN : " + text : null);
-  const rollCmd = (bonus, i) => "/roll " + ["1d20", "2d20k1", "2d20kl1"][i] + (bonus ? (bonus > 0 ? "+" : "-") + Math.abs(bonus) : "");
-  const rolls = (bonus, label, hint) => h("span", { class: "rolls" }, ["N", "A", "D"].map((t, i) =>
-    h("button", { class: ["roll", "roll-" + t, hint === t && "hint"], "data-action": "roll", "data-roll": rollCmd(bonus, i),
-      title: label + " " + ["normal", "avec avantage", "avec désavantage"][i] + " : copier « " + rollCmd(bonus, i) + " »" }, t)));
+  const rolls = (bonus, label, hint) => h("span", { class: "rolls" }, [["N", "", "normal"], ["A", "adv", "avec avantage"], ["D", "dis", "avec désavantage"]].map(([t, mode, text]) =>
+    h("button", { class: ["roll", "roll-" + t, hint === t && "hint"], "data-action": "roll", "data-roll": E.rollCommand(bonus, mode),
+      title: label + " " + text + " : copier « " + E.rollCommand(bonus, mode) + " »" }, t)));
   const damageRoll = (text, label) => {
-    const m = /\d+d\d+(\s*[+−-]\s*\d+)?/.exec(text || "");
-    if (!m) return text;
-    const cmd = "/roll " + m[0].replace(/−/g, "-").replace(/\s/g, "");
-    return [text.slice(0, m.index), h("button", { class: "roll-dmg", "data-action": "roll", "data-roll": cmd, title: "Dégâts de " + label + " : copier « " + cmd + " »" }, m[0]), text.slice(m.index + m[0].length)];
+    const d = E.diceIn(text);
+    return d ? [text.slice(0, d.index), h("button", { class: "roll-dmg", "data-action": "roll", "data-roll": d.command, title: "Dégâts de " + label + " : copier « " + d.command + " »" }, d.text), text.slice(d.index + d.text.length)] : text;
   };
 
   DND.views.play = function (App) {

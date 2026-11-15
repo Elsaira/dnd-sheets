@@ -90,7 +90,8 @@
         description: "À la fin d'un repos court, récupérez des points de sorcellerie, jusqu'à la moitié de votre niveau d'ensorceleur (arrondi à l'inférieur). Une fois par repos long.",
         effects: [
           { type: "resource", id: "sorcerousRestoration", name: { fr: "Restauration ensorcelée", en: "Sorcerous Restoration" }, max: 1, recharge: "long",
-            description: (c) => "Repos court : récupérez jusqu'à " + Math.floor(lvl(c) / 2) + " points de sorcellerie (à rendre avec les pastilles)." },
+            restores: { id: "sorceryPoints", amount: (c) => Math.floor(lvl(c) / 2), shortRest: true },
+            description: (c) => "À la fin d'un repos court : récupérez jusqu'à " + Math.floor(lvl(c) / 2) + " points de sorcellerie (bouton dans la fenêtre Repos court)." },
         ] },
       { level: 7, id: "sorcery-incarnate", name: { fr: "Sorcellerie incarnée", en: "Sorcery Incarnate" },
         description: "Sans utilisation de Sorcellerie innée, vous pouvez l'activer pour 2 points de sorcellerie par une action bonus. Tant qu'elle est active, vous pouvez utiliser jusqu'à deux options de Métamagie par sort." },

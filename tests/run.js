@@ -519,6 +519,12 @@ eq("Création sans points : refusée", /Il faut 2/.test(R.createSlot(ch, s, spId
 R.convertSlot(ch, s, spId, 2);
 s = E.compute(ch);
 eq("Conversion niv. 2 : +2 points, emplacement dépensé", [s.resources.find((r) => r.id === spId).spent, s.spellSlots[1].spent], [3, 1]);
+R.restoreResource(ch, s, "sorcerer.sorcerousRestoration");
+s = E.compute(ch);
+eq("Restauration ensorcelée niv. 5 : +2 points, 1/repos long", [s.resources.find((r) => r.id === spId).spent, s.resources.find((r) => r.id === "sorcerer.sorcerousRestoration").spent], [1, 1]);
+R.restoreResource(ch, s, "sorcerer.sorcerousRestoration");
+eq("Restauration ensorcelée déjà utilisée", E.compute(ch).resources.find((r) => r.id === spId).spent, 1);
+s = E.compute(ch);
 R.addSlot(ch, s, 3, 1);
 eq("Bouton + absent sans extraSlots", E.compute(ch).spellSlots[2].extra, 1);
 s = E.compute(ch);

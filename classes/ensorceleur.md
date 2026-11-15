@@ -52,5 +52,5 @@ Noms d'AideDD pour la classe, les options de Métamagie, la Sorcellerie draconiq
 - 2026-10-15 : niveaux 1 à 10 et 4 sous-classes **faits**, 21 tests automatiques. **À tester par un joueur.**
 - 2026-10-15 : Sorcellerie des tempêtes ajoutée (5 tests). **À tester par le joueur de l'ensorceleur.**
 
-- 2026-11-15 : boutons « Créer » et « Convertir » sous les Points de sorcellerie (options `slotCreate` / `slotConvert`), qui dépensent ou rendent les points ; plus de + gratuit sur la carte Emplacements.
+- 2026-11-15 : boutons « Créer » et « Convertir » sous les Points de sorcellerie (options `slotCreate` / `slotConvert`), qui dépensent ou rendent les points ; plus de + gratuit sur la carte Emplacements. Restauration ensorcelée : bouton dans la fenêtre Repos court seulement (option `restores` avec `shortRest: true`).
 - 2026-11-10 : emplacements créés par la Réserve arcanique suivis sur la fiche (bouton + de la carte Emplacements de sorts, effet `extraSlots`, perdus au repos long).

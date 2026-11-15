@@ -149,6 +149,19 @@
     return r.name.fr + " : " + n + " emplacement" + (n > 1 ? "s" : "") + " de pacte récupéré" + (n > 1 ? "s" : "") + ".";
   };
 
+  R.restoreResource = function (ch, sheet, id) {
+    const r = sheet.resources.find((x) => x.id === id);
+    const t = r && r.restores && sheet.resources.find((x) => x.id === r.restores.id);
+    if (!t || r.spent >= r.max) return;
+    const n = Math.min(r.restores.amount, t.spent);
+    if (!n) return "Aucun point à récupérer.";
+    const b = blockedMsg(ch, r);
+    if (b) return b;
+    ch.state.resources[t.id] = t.spent - n;
+    ch.state.resources[id] = r.spent + 1;
+    return r.name.fr + " : +" + n + " " + t.name.fr.toLowerCase() + ".";
+  };
+
   R.createSlot = function (ch, sheet, id, level) {
     const r = sheet.resources.find((x) => x.id === id);
     const cost = r && r.slotCreate && r.slotCreate[level];

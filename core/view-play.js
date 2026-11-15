@@ -669,7 +669,7 @@
         h("input", { type: "number", min: 0, class: "amount", placeholder: "PV", value: App.ui.amount, "data-ui": "amount", "data-enter": "heal", "aria-label": "PV récupérés" }),
         h("button", { class: "good", "data-action": "heal" }, "Ajouter les PV")),
       s.resources.filter((r) => r.restores && r.restores.shortRest && r.spent < r.max).map((r) => h("div", { class: "row" }, restoreButton(s, r))),
-      h("p", { class: "muted small-text" }, "Les ressources de repos court et les emplacements de Magie de pacte seront récupérés en terminant le repos."),
+      h("p", { class: "muted small-text" }, "Les ressources de repos court" + (s.pact ? " et les emplacements de Magie de pacte" : "") + " seront récupérés en terminant le repos."),
       h("div", { class: "row end" },
         h("button", { "data-action": "closeModal" }, "Annuler"),
         h("button", { class: "primary", "data-action": "shortRest" }, "Terminer le repos court"))];

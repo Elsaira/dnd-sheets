@@ -282,7 +282,7 @@
         h("thead", null, h("tr", null, h("th", null, "Nom"), h("th", null, "Attaque"), h("th", null, "Dégâts"), h("th", null, "Portée"))),
         h("tbody", null, s.attacks.map((a) => h("tr", { class: a.kind === "weapon" && !a.equipped ? "dim" : "" },
           h("td", { title: [en(a.nameEn), a.props.join(", ")].filter(Boolean).join(" · ") },
-            actionMarker(a.kind === "spell" ? a.spell.castingTime : "action"),
+            actionMarker(a.kind === "spell" ? a.castingTime : "action"),
             a.kind === "spell" && a.spell && !a.spell.custom
               ? h("a", { href: DND.config.spellUrl(a.spell), target: "_blank", rel: "noopener", title: "EN : " + a.spell.name.en + " · description complète sur AideDD" }, a.name)
               : a.name,
@@ -311,7 +311,7 @@
         const spell = sp.spell;
         const info = [spell.level ? "Niveau " + spell.level : "Tour de magie", E.range(spell.range), spell.duration].filter(Boolean).join(" · ");
         return h("li", null,
-          h("span", { class: "support-spell-name" }, actionMarker(spell.castingTime),
+          h("span", { class: "support-spell-name" }, actionMarker(sp.castingTime),
             spell.custom ? h("b", null, spell.name.fr)
               : h("a", { href: DND.config.spellUrl(spell), target: "_blank", rel: "noopener", title: "EN : " + spell.name.en + " · description complète sur AideDD" }, spell.name.fr)),
           h("span", { class: "small-text muted" }, info + (spell.concentration ? " · Concentration" : "")),
@@ -452,11 +452,11 @@
     if (sp.damage) effect.push(sp.damage + (sp.damageAlt ? " (" + sp.damageAlt + ")" : ""));
     return h("li", { class: "spell" },
       h("div", { class: "spell-main" },
-        actionMarker(spell.castingTime),
+        actionMarker(sp.castingTime),
         spell.custom ? h("b", null, spell.name.fr)
           : h("a", { href: DND.config.spellUrl(spell), target: "_blank", rel: "noopener", title: "EN : " + spell.name.en + " · description complète sur AideDD" }, spell.name.fr),
         tags,
-        (() => { const info = [CAST[spell.castingTime] || spell.castingTime, E.range(spell.range), (up && up.duration) || spell.duration].filter(Boolean).join(" · ");
+        (() => { const info = [CAST[sp.castingTime] || sp.castingTime, E.range(spell.range), (up && up.duration) || spell.duration].filter(Boolean).join(" · ");
           return info ? h("span", { class: "muted small-text" }, " · " + info) : null; })(),
         effect.length ? h("div", { class: "small-text" }, effect.join(" · ")) : null,
         spell.notes ? h("div", { class: "small-text muted" }, spell.notes) : null,

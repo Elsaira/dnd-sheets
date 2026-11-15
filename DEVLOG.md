@@ -1,5 +1,9 @@
 # Journal de développement : fiches D&D 5.5 (règles 2024)
 
+## 2026-11-15 : Stabilisation en action bonus (Sépulcre)
+
+Signalé par Plouf : la pastille de Stabilisation restait « Action » pour le Domaine du Sépulcre. Nouveau type d'effet générique `castingTime` (`{ spell, value }`) : le moteur pose `castingTime` sur chaque sort de la fiche (et sur ses attaques), les vues le lisent au lieu de `spell.castingTime`. Cercle de mortalité (niv. 3) l'utilise pour Stabilisation. 513 tests.
+
 ## 2026-11-15 : Jets Discord, expression seule
 
 Dice Maiden (github.com/Humblemonk/dicemaiden-rs) n'accepte que la commande slash tapée : coller « /roll … » ne marche pas. Les boutons copient maintenant seulement l'expression (`1d20-1`, `2d20 k1+5`, `2d20 kl1+5`, `1d4+2`) à coller dans la case « dice » après avoir tapé /roll. Syntaxe k1/kl1 vérifiée dans roll_syntax.md du bot (alias `+d20` → `2d20 k1`, espace avant k comme dans sa doc). 511 tests.

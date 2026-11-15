@@ -116,6 +116,8 @@ module.exports = function (DND, eq) {
   eq("Tombe 10 : Dissipation du mal et du bien et Rappel à la vie préparés", ["dispel-evil-and-good", "raise-dead"].every((id) => s.spells.some((x) => x.spell.id === id && x.alwaysPrepared)), true);
   ch.classes[0].level = 17;
   s = E.compute(ch);
+  eq("Sépulcre : Stabilisation en action bonus", s.spells.find((x) => x.spell.id === "spare-the-dying").castingTime, "bonus");
+  eq("Stabilisation reste une action hors Sépulcre", DND.data.spells["spare-the-dying"].castingTime, "action");
   eq("Tombe 17 : Repousser la mort 1d6, Gardien des âmes 1/repos court, 34 PV", [s.actions.find((a) => a.name.en === "Circle of Mortality").description.includes("+1d6"), res(s, "cleric.keeperOfSouls").max, res(s, "cleric.keeperOfSouls").recharge, res(s, "cleric.keeperOfSouls").description.startsWith("34 ")], [true, 1, "short", true]);
   eq("Sépulcre : intitulés et Empire funeste affichés", [DND.lists["subclass:cleric"].find((x) => x.id === "grave").name.fr, s.actions.find((a) => a.name.en === "Circle of Mortality").description.includes("Empire funeste"), s.actions.find((a) => a.name.en === "Path to the Grave").name.fr], ["Domaine du Sépulcre", true, "Voie du Sépulcre"]);
   eq("Nécromancie améliorée : détail conservé dans les notes", s.notes.some((x) => /Nécromancie améliorée/.test(x.text)), true);

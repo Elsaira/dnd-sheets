@@ -662,6 +662,8 @@
         atWill: !!e.atWill, ...decorate(spell, ability, pactLevelFor(spell, x.source.kind === "class" ? x.source.id : null, e.atWill)) });
     }
     sheet.spells.sort((a, b) => a.spell.level - b.spell.level || a.spell.name.fr.localeCompare(b.spell.name.fr));
+    const castingTimes = Object.fromEntries(of("castingTime").map((x) => [x.effect.spell, x.effect.value]));
+    for (const sp of sheet.spells) sp.castingTime = castingTimes[sp.spell.id] || sp.spell.castingTime;
   }
 
   E.concentrationInfo = function (sheet, state) {
@@ -824,7 +826,7 @@
       range: E.meters(5), props: [], option: unarmed.label });
     for (const s of sheet.spells) {
       if (s.spell.damage && (s.spell.attack || s.spell.save)) {
-        attacks.push({ kind: "spell", spell: s.spell, name: s.spell.name.fr, nameEn: s.spell.name.en, toHit: s.spell.attack ? s.attack : null,
+        attacks.push({ kind: "spell", spell: s.spell, castingTime: s.castingTime, name: s.spell.name.fr, nameEn: s.spell.name.en, toHit: s.spell.attack ? s.attack : null,
           save: s.spell.save ? { ability: s.spell.save, dc: s.dc } : null, damage: s.damage, alt: s.damageAlt,
           range: E.range(s.spell.range), props: [] });
       }

@@ -49,7 +49,7 @@ Source : règles 2024, textes et noms d'après [AideDD](https://www.aidedd.org/r
   - Version du livre *Ravenloft: The Horrors Within* (RHW p. 19-20, VO), d'après les captures envoyées par Plouf le 2026-11-11. Noms français repris de l'Arcanes exhumés 2025 (AideDD) en attendant la VF.
   - Différences avec l'Arcanes exhumés : sorts de domaine (Fausse vie, Stabilisation, Protection contre la mort au lieu de Contact glacial et Immobilisation de monstre), Repousser la mort sur toute créature blessée (1d6 au niv. 11), Stabilisation en action bonus, Chemin de la tombe jusqu'au début du prochain tour et + niveau de clerc (sans 1d8), Sentinelle à 18 m et critique annulé, Gardien des âmes = 2 × niveau en PV (pas temporaires), recharge aussi avec un emplacement de niveau 6+.
   - 2026-11-14 : noms de la VF « Ravenloft : Les reflets de l'horreur » (Domaine du Sépulcre, Cercle de mortalité, Voie du Sépulcre), apportés par un ami.
-  - Stabilisation est un sort de domaine : toujours préparé, il ne compte pas dans les sorts mineurs.
+  - Stabilisation est un sort de domaine (pastille « Action bonus » via l effet `castingTime`) : toujours préparé, il ne compte pas dans les sorts mineurs.
   - Coquille antivie n'est plus un sort de domaine ; elle reste au catalogue (modules/spells/cleric-grave.js) pour les druides.
 
 ### Termes français

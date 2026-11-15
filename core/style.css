@@ -99,8 +99,8 @@ html.paper .ability.ability-color { border-top-color: var(--ability-color); }
 .rolls { display: inline-flex; flex-shrink: 0; gap: 1px; margin-left: .25rem; vertical-align: middle; }
 .ability, .stat { position: relative; }
 .ability .rolls, .stat .rolls { display: flex; justify-content: center; position: absolute; left: 0; right: 0; margin: 0; }
-.ab-score + .rolls { top: 2.85rem; } .ability:hover .ab-score { visibility: hidden; }
-.ab-save + .rolls { top: calc(100% - 2px); z-index: 5; padding: .2rem 0; background: var(--panel); border: 1px solid var(--border); border-top: none; border-radius: 0 0 8px 8px; }
+.ab-score + .rolls { top: 3.1rem; } .ability:hover .ab-score { visibility: hidden; }
+.ab-save + .rolls { top: calc(100% - 2px); z-index: 5; padding: .35rem 0 .25rem; background: var(--panel); border: 1px solid var(--border); border-top: none; border-radius: 0 0 8px 8px; }
 .stat .rolls { top: .3rem; } .stat:hover:has(.rolls) .stat-label { visibility: hidden; }
 .roll { font-family: inherit; font-size: .62rem; font-weight: 600; line-height: 1; padding: .1rem .14rem; min-width: .9rem; border-radius: 3px; background: var(--panel-2); color: var(--muted); }
 .roll-A.hint { color: var(--good); border-color: var(--good); } .roll-D.hint { color: var(--bad); border-color: var(--bad); }

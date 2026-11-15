@@ -22,7 +22,7 @@ Les emplacements de pacte sont suivis à part des emplacements « normaux » (ut
 |---|---|---|
 | 1 | Manifestations occultes (1) | Choix dans la liste, prérequis vérifiés, manifestations affichées dans Aptitudes |
 | 1 | Magie de pacte | DD et attaque de sort (Charisme), 2 tours de magie, 2 sorts préparés, 1 emplacement niv. 1 |
-| 2 | Manifestations (3), Rouerie magique | Compteur d'Rouerie magique |
+| 2 | Manifestations (3), Rouerie magique | Bouton qui rend les emplacements de pacte |
 | 3 | Sous-classe | Choix du protecteur ; emplacements niv. 2 ; 4 sorts préparés |
 | 4 | Amélioration de caractéristique | Choix d'un don (général ou d'origine) ; 3 tours de magie ; 5 sorts |
 | 5 | Manifestations (5) | Emplacements niv. 3 ; 6 sorts ; Décharge occulte à 2 rayons |
@@ -48,7 +48,7 @@ Les emplacements de pacte sont suivis à part des emplacements « normaux » (ut
 - **Armure des ombres** : la CA « Armure de mage » (13 + Dex) est prise en compte automatiquement sans armure.
 - **Manifestations répétables** (Décharge déchirante, Lance occulte, Leçons des Premiers…) : une seule fois pour l'instant.
 - **Prérequis** : vérifiés au moment du choix (niveau, pacte requis). Une manifestation déjà choisie dont le prérequis n'est plus rempli (après une baisse de niveau) n'est pas retirée automatiquement.
-- **Rouerie magique** : simple compteur ; les emplacements récupérés se rendent à la main avec les pastilles.
+- **Rouerie magique** : bouton « Utiliser » qui dépense la Rouerie et rend les emplacements de pacte dépensés, au plus la moitié du maximum arrondie au supérieur (option `pactRegain: 0.5`, 2026-11-15). Maître occulte (niv. 20, tout récupérer) non géré : la fiche s'arrête avant.
 - Manifestations des niveaux 12+ (Lame dévorante, Vision de sorcière…) non saisies.
 
 - **Résilience céleste** : les PV temporaires ne sont pas ajoutés automatiquement au repos (le moteur ne sait que rendre l'Inspiration héroïque au repos) ; la valeur est affichée en rappel, à saisir dans PV temporaires.

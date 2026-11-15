@@ -181,7 +181,7 @@
         description: "Incantation basée sur le Charisme. Tous vos emplacements sont du même niveau et se récupèrent au repos court ou long. Vous pouvez changer un tour de magie et un sort préparé à chaque niveau." },
       { level: 2, id: "magical-cunning", name: { fr: "Rouerie magique", en: "Magical Cunning" },
         description: "Rite d'une minute : récupérez des emplacements de Magie de pacte dépensés, jusqu'à la moitié de votre maximum (arrondi au supérieur). Une fois par repos long.",
-        effects: [{ type: "resource", id: "magicalCunning", name: { fr: "Rouerie magique", en: "Magical Cunning" }, max: 1, recharge: "long",
+        effects: [{ type: "resource", id: "magicalCunning", name: { fr: "Rouerie magique", en: "Magical Cunning" }, max: 1, recharge: "long", pactRegain: 0.5,
           description: "Rite d'une minute : récupérer la moitié des emplacements de pacte (arrondi au supérieur)." }] },
       { level: 3, id: "subclass", name: { fr: "Sous-classe d'occultiste", en: "Warlock Subclass" },
         description: "Choisissez votre protecteur dans la partie Création." },

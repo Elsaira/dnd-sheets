@@ -18,7 +18,7 @@ Source : règles 2024, textes et noms d'après [AideDD](https://www.aidedd.org/r
 |---|---|---|
 | 1 | Sorts | Charisme ; 4 sorts mineurs (5 au niv. 4, 6 au niv. 10) ; sorts préparés 2 → 15 au niv. 10 |
 | 1 | Sorcellerie innée | Compteur + action bonus (DD +1 affiché) |
-| 2 | Réserve arcanique | Compteur de points ; actions Convertir / Créer un emplacement avec les coûts accessibles au niveau |
+| 2 | Réserve arcanique | Compteur de points ; boutons « Créer » (coûts accessibles au niveau) et « Convertir » sous les points |
 | 2 | Métamagie (2) | Choix dans les 10 options d'AideDD ; chaque option devient une action avec son coût |
 | 3 | Sous-classe | Choix |
 | 4, 8 | Amélioration de caractéristique | Choix d'un don |
@@ -52,4 +52,5 @@ Noms d'AideDD pour la classe, les options de Métamagie, la Sorcellerie draconiq
 - 2026-10-15 : niveaux 1 à 10 et 4 sous-classes **faits**, 21 tests automatiques. **À tester par un joueur.**
 - 2026-10-15 : Sorcellerie des tempêtes ajoutée (5 tests). **À tester par le joueur de l'ensorceleur.**
 
+- 2026-11-15 : boutons « Créer » et « Convertir » sous les Points de sorcellerie (options `slotCreate` / `slotConvert`), qui dépensent ou rendent les points ; plus de + gratuit sur la carte Emplacements. Restauration ensorcelée : bouton dans la fenêtre Repos court seulement (option `restores` avec `shortRest: true`).
 - 2026-11-10 : emplacements créés par la Réserve arcanique suivis sur la fiche (bouton + de la carte Emplacements de sorts, effet `extraSlots`, perdus au repos long).

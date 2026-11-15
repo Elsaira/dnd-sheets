@@ -230,6 +230,14 @@ eq("Chance du Ténébreux (CHA +3)", s.resources.find((r) => r.id === "warlock.d
 eq("Communication avec le protecteur gratuit", s.resources.some((r) => r.id === "spell:warlock:contact-other-plane"), true);
 eq("Tours de magie niveau 10", s.casting[0].cantrips, 4);
 eq("Sorts préparés niveau 10", s.casting[0].prepared, 10);
+eq("Rouerie magique sans emplacement dépensé : rien", /Aucun/.test(DND.rules.regainPact(ch, s, "warlock.magicalCunning")), true);
+ch.state.pactSpent = 2;
+s = E.compute(ch);
+DND.rules.regainPact(ch, s, "warlock.magicalCunning");
+s = E.compute(ch);
+eq("Rouerie magique : 1 emplacement de pacte sur 2 récupéré, 1/repos long", [s.pact.spent, s.resources.find((r) => r.id === "warlock.magicalCunning").spent], [1, 1]);
+DND.rules.regainPact(ch, s, "warlock.magicalCunning");
+eq("Rouerie magique déjà utilisée", E.compute(ch).pact.spent, 1);
 
 // 9 bis. Protecteur Archifée (sous-classe ajoutée par un fichier séparé)
 ch.classes = [{ id: "warlock", level: 10, subclass: "archfey", choices: {} }];
@@ -500,9 +508,26 @@ ch.inventory = [{ id: "shield", qty: 1, equipped: true }, { id: "greatsword", qt
 s = E.compute(ch);
 eq("Bouclier non maîtrisé : pas de bonus de CA", [s.ac.value, s.warnings.some((w) => /Bouclier non maîtrisé/.test(w))], [10, true]);
 eq("Arme lourde, Force < 13 : avertissement", s.warnings.some((w) => /Lourde/.test(w)), true);
-R.addSlot(ch, s, 3, 1); R.addSlot(ch, s, 4, 1);
+const spId = s.resources.find((r) => r.slotCreate).id;
+eq("Ensorceleur 5 : coûts de création", s.resources.find((r) => r.id === spId).slotCreate, { 1: 2, 2: 3, 3: 5 });
+R.createSlot(ch, s, spId, 4);
+eq("Création niv. 4 refusée au niveau 5", Object.keys(ch.state.slotsExtra).length, 0);
+R.createSlot(ch, s, spId, 3);
 s = E.compute(ch);
-eq("Ensorceleur 5 : emplacement créé (niveau 3 au plus)", [s.spellSlots.map((x) => x.max), s.spellSlots[2].extra], [[4, 3, 3], 1]);
+eq("Ensorceleur 5 : emplacement niv. 3 créé pour 5 points", [s.spellSlots.map((x) => x.max), s.spellSlots[2].extra, s.resources.find((r) => r.id === spId).spent], [[4, 3, 3], 1, 5]);
+eq("Création sans points : refusée", /Il faut 2/.test(R.createSlot(ch, s, spId, 1)), true);
+R.convertSlot(ch, s, spId, 2);
+s = E.compute(ch);
+eq("Conversion niv. 2 : +2 points, emplacement dépensé", [s.resources.find((r) => r.id === spId).spent, s.spellSlots[1].spent], [3, 1]);
+R.restoreResource(ch, s, "sorcerer.sorcerousRestoration");
+s = E.compute(ch);
+eq("Restauration ensorcelée niv. 5 : +2 points, 1/repos long", [s.resources.find((r) => r.id === spId).spent, s.resources.find((r) => r.id === "sorcerer.sorcerousRestoration").spent], [1, 1]);
+R.restoreResource(ch, s, "sorcerer.sorcerousRestoration");
+eq("Restauration ensorcelée déjà utilisée", E.compute(ch).resources.find((r) => r.id === spId).spent, 1);
+s = E.compute(ch);
+R.addSlot(ch, s, 3, 1);
+eq("Bouton + absent sans extraSlots", E.compute(ch).spellSlots[2].extra, 1);
+s = E.compute(ch);
 R.longRest(ch, s);
 eq("Repos long : emplacements créés perdus", E.compute(ch).spellSlots.map((x) => x.max), [4, 3, 2]);
 ch.state.exhaustion = 2;

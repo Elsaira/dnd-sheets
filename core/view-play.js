@@ -466,7 +466,8 @@
         return h("li", null,
           h("span", { class: "support-spell-name", "data-action": "toggleAction", "data-name": a.name.fr, title: open ? "Masquer le texte" : resourceText(r, a) },
             actionMarker(a.actionType), h("b", null, a.name.fr)),
-          h("span", { class: "small-text muted" }, ACTION_TYPES[a.actionType] || a.actionType),
+          h("span", { class: "small-text" }, open ? null : diceRolls(resourceText(r, a), a.name.fr).filter((x) => typeof x !== "string").map((b) => [b, " "]),
+            h("span", { class: "muted" }, ACTION_TYPES[a.actionType] || a.actionType)),
           open ? h("div", { class: "small-text resource-text" }, diceRolls(resourceText(r, a), a.name.fr)) : null);
       })));
   }
@@ -579,7 +580,7 @@
         return h("div", { class: ["action", open && "open"] },
           h("div", { class: "action-head", "data-action": "toggleAction", "data-name": a.name.fr, title: open ? "Masquer le texte" : "Afficher le texte" },
             h("b", null, a.name.fr), " ", h("span", { class: "tag" }, ACTION_TYPES[a.actionType] || a.actionType)),
-          open ? Array.isArray(a.description) ? traitList(a.description) : h("div", { class: "small-text" }, a.description) : null);
+          open ? Array.isArray(a.description) ? traitList(a.description) : h("div", { class: "small-text" }, diceRolls(a.description, a.name.fr)) : null);
       }));
   };
 

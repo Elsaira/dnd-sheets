@@ -2,7 +2,7 @@
 
 ## 2026-11-26 : Jets copiables dans les sorts, les soins et le Conduit divin
 
-Demandé par Plouf. Onglet Sorts : boutons N / A / D (au survol) sur « Attaque +x » des sorts à jet d'attaque, dés de dégâts (et dégâts alternatifs) cliquables, valeur de soins affichée et cliquable. Carte « Soins » : la valeur de soins copie ses dés. Cartes de ressource `spellTab` (Conduit divin, onglets Sorts et Combat) : chaque expression de dés du texte est cliquable (ex. Étincelle divine `1d8+3`, Radiance de l'Aube `2d10+6`). Nouveau `diceRolls` dans core/view-play.js (toutes les expressions de dés d'un texte), `damageRoll` passe par lui. Seules les valeurs déjà calculées sont copiées, aucun bonus soumis à condition. 531 tests.
+Demandé par Plouf. Onglet Sorts : boutons N / A / D (au survol) sur « Attaque +x » des sorts à jet d'attaque, dés de dégâts (et dégâts alternatifs) cliquables, valeur de soins affichée et cliquable. Carte « Soins » : la valeur de soins copie ses dés. Cartes de ressource `spellTab` (Conduit divin, onglets Sorts et Combat) : chaque expression de dés du texte est cliquable (ex. Étincelle divine `1d8+3`, Radiance de l'Aube `2d10+6`). Nouveau `diceRolls` dans core/view-play.js (toutes les expressions de dés d'un texte), `damageRoll` passe par lui. Seules les valeurs déjà calculées sont copiées, aucun bonus soumis à condition. Après demande de Plouf, onglet Combat : la carte « Conduit divin » montre les dés de chaque option à côté de son nom (sans ouvrir le texte), et le texte déplié des « Actions spéciales » rend ses dés cliquables. 531 tests.
 
 ## 2026-11-26 : Jets copiés au format « /roll dice: »
 

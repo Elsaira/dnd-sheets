@@ -350,6 +350,7 @@ module.exports = function (DND, eq) {
   eq("Duel : pas sur une arme à deux mains ni à distance", [atk("greatsword").damage, atk("dart").damage], ["2d6+3 tranchant", "1d4+3 perforant"]);
   eq("Duel : pas de bonus si une autre arme est équipée", atk("dagger").damage, "1d4+3 perforant");
   eq("Duel : étiquette sur l'attaque", atk("longsword").option, "Duel");
+  eq("Détail au survol : dégâts et attaque", [atk("longsword").dmgInfo, atk("longsword").altInfo, atk("longsword").hitInfo], ["1d8 arme + 3 FOR + 2 Duel", "1d10 arme + 3 FOR", "3 FOR + 3 maîtrise"]);
   ch.inventory[1].equipped = false;
   s = E.compute(ch);
   eq("Duel : dague seule tenue = +2", atk("dagger").damage, "1d4+5 perforant");

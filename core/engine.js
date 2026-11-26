@@ -773,6 +773,9 @@
     // weaponAbility : certaines armes peuvent utiliser une autre caractéristique et un dé de dégâts minimal
     // (ex. armes de moine : Dextérité et dé d'Arts martiaux). filter(arme) choisit les armes concernées.
     const weaponOptions = active("weaponAbility");
+    const ab = (a) => DND.data.labels[a].short;
+    const parts = (target) => sheet.bonusParts(target).map((p) => [p.value, p.label]);
+    const pen = [-sheet.d20Penalty, "épuisement"];
     const perWeapon = active("bonus").filter((x) => x.effect.weapon && x.effect.target === "damage.weapon");
     ch.inventory.forEach((item, index) => {
       const w = DND.data.weapons[item.id];
@@ -798,16 +801,21 @@
       }
       const magic = Number(item.bonus) || 0;
       const toHit = mod[ability] + (proficient ? pb : 0) + magic + bonus("attack.weapon") + bonus("attack." + w.type) - sheet.d20Penalty;
+      const hitInfo = E.detail([[mod[ability], ab(ability)], [proficient ? pb : 0, "maîtrise"], [magic, "magique"], ...parts("attack.weapon"), ...parts("attack." + w.type), pen]);
       const need = w.type === "ranged" ? "dex" : "str";
       if (item.equipped && props.includes("heavy") && c.score[need] < 13) sheet.warnings.push((item.name || w.name.fr) + " (Lourde) : " + DND.data.labels[need].fr + " inférieure à 13, Désavantage aux jets d'attaque.");
       const others = ch.inventory.filter((it, i) => i !== index && it.equipped && DND.data.weapons[it.id]);
       const extra = (twoHanded) => perWeapon.filter((x) => x.effect.weapon(w, { item, others, twoHanded, c }));
       const dmgMod = mod[ability] + magic + bonus("damage.weapon") + bonus("damage." + w.type);
-      const fmt = (dice, twoHanded) => { const m = dmgMod + extra(twoHanded).reduce((s, x) => s + (Number(sheet.val(x.effect.value, x)) || 0), 0); return dice + (m ? E.signed(m) : ""); };
+      const extraParts = (twoHanded) => extra(twoHanded).map((x) => [Number(sheet.val(x.effect.value, x)) || 0, x.effect.label || x.source.label]);
+      const fmt = (dice, twoHanded) => { const m = dmgMod + extraParts(twoHanded).reduce((s, p) => s + p[0], 0); return dice + (m ? E.signed(m) : ""); };
+      const dmgInfo = (dice, twoHanded) => E.detail([[dice, twoHanded ? "arme" : dieLabel], [mod[ability], ab(ability)], [magic, "magique"], ...parts("damage.weapon"), ...parts("damage." + w.type), ...extraParts(twoHanded)]);
+      const dieLabel = dice !== w.damage ? option : "arme";
       const labels = extra(false).map((x) => x.effect.label || x.source.label);
       if (labels.length) option = [option].concat(labels).filter(Boolean).join(", ");
       attacks.push({
-        kind: "weapon", index, name: item.name || w.name.fr, nameEn: w.name.en, ability, proficient, toHit,
+        kind: "weapon", index, name: item.name || w.name.fr, nameEn: w.name.en, ability, proficient, toHit, hitInfo, dmgInfo: dmgInfo(dice),
+        altInfo: w.versatile ? dmgInfo(w.versatile, true) : null,
         damage: fmt(dice) + " " + DND.label(w.damageType).toLowerCase(),
         alt: w.versatile && avg(w.versatile) > avg(dice) ? fmt(w.versatile, true) + " à 2 mains" : null,
         range: w.range ? E.meters(w.range[0]) + "/" + E.meters(w.range[1]) : props.includes("reach") ? E.meters(10) : E.meters(5),
@@ -829,17 +837,24 @@
     const unarmedMod = mod[unarmed.ability] + bonus("damage.unarmed");
     attacks.push({ kind: "unarmed", name: "Frappe à mains nues", nameEn: "Unarmed Strike", ability: unarmed.ability, proficient: true,
       toHit: mod[unarmed.ability] + pb + bonus("attack.unarmed") - sheet.d20Penalty,
+      hitInfo: E.detail([[mod[unarmed.ability], ab(unarmed.ability)], [pb, "maîtrise"], ...parts("attack.unarmed"), pen]),
+      dmgInfo: E.detail([[unarmed.dice || 1, unarmed.dice ? unarmed.label : "base"], [mod[unarmed.ability], ab(unarmed.ability)], ...parts("damage.unarmed")]),
       damage: (unarmed.dice ? unarmed.dice + (unarmedMod ? E.signed(unarmedMod) : "") : Math.max(0, 1 + unarmedMod)) + " contondant",
       range: E.meters(5), props: [], option: unarmed.label });
     for (const s of sheet.spells) {
       if (s.spell.damage && (s.spell.attack || s.spell.save)) {
+        const sp = parts("spellDamage." + s.spell.id);
         attacks.push({ kind: "spell", spell: s.spell, castingTime: s.castingTime, name: s.spell.name.fr, nameEn: s.spell.name.en, toHit: s.spell.attack ? s.attack : null,
+          hitInfo: s.spell.attack && s.ability ? E.detail([[pb, "maîtrise"], [mod[s.ability], ab(s.ability)], ...parts("spellAttack"), pen]) : null,
+          dmgInfo: sp.length ? E.detail([[(/\d*d\d+/.exec(s.damage) || ["dés"])[0], "sort"], ...sp]) : null,
           save: s.spell.save ? { ability: s.spell.save, dc: s.dc } : null, damage: s.damage, alt: s.damageAlt,
           range: E.range(s.spell.range), props: [] });
       }
     }
     return attacks;
   }
+
+  E.detail = (list) => list.filter(([v]) => v).map(([v, l], i) => (typeof v === "number" ? (i ? (v < 0 ? "− " : "+ ") + Math.abs(v) : v) : (i ? "+ " : "") + v) + " " + l).join(" ");
 
   // Affichage des distances en mètres (1,5 m par case de 5 pieds)
   E.meters = (feet) => {

@@ -110,9 +110,21 @@
     const attackCards = [attacks, supports, healing].filter(Boolean);
     const attackPair = attackCards.length > 1 ? h("div", { class: ["attack-support-pair", supports && healing && "support-healing-grid"] }, attackCards) : attackCards[0];
     const resourceCards = [resourcesCard(s), slotsCard(s)].filter(Boolean);
-    return h("div", { class: "grid2 combat-grid" },
+    return foldCards(ch, h("div", { class: "grid2 combat-grid" },
       h("div", null, hpCard(App), concentrationCard(App), restCard(s), conditionsCard(ch, s), s.companions.map((cp) => companionCard(App, cp))),
-      h("div", null, attackPair, resourceCards.length ? h("div", { class: "resource-pair" }, resourceCards) : null, actionsCard(s), notesCard(s)));
+      h("div", null, attackPair, resourceCards.length ? h("div", { class: "resource-pair" }, resourceCards) : null, actionsCard(s), notesCard(s))));
+  }
+
+  function foldCards(ch, root) {
+    const folded = ch.settings.folded || {};
+    for (const t of root.querySelectorAll("section.card:not(.hp) > h3")) {
+      const key = t.textContent, card = t.parentNode;
+      Object.assign(t.dataset, { action: "foldCard", card: key });
+      t.classList.add("fold-head");
+      t.title = folded[key] ? "Déplier" : "Replier";
+      if (folded[key]) { card.classList.add("folded"); card.replaceChildren(t); }
+    }
+    return root;
   }
 
   function hpCard(App) {
@@ -405,9 +417,13 @@
   function actionsCard(s) {
     if (!s.actions.length) return null;
     return h("section", { class: "card" }, h("h3", null, "Actions spéciales"),
-      s.actions.map((a) => h("div", { class: "action" },
-        h("div", null, h("b", null, a.name.fr), " ", h("span", { class: "tag" }, ACTION_TYPES[a.actionType] || a.actionType)),
-        Array.isArray(a.description) ? traitList(a.description) : h("div", { class: "small-text" }, a.description))));
+      s.actions.map((a) => {
+        const open = DND.app.ui.openActions[a.name.fr];
+        return h("div", { class: ["action", open && "open"] },
+          h("div", { class: "action-head", "data-action": "toggleAction", "data-name": a.name.fr, title: open ? "Masquer le texte" : "Afficher le texte" },
+            h("b", null, a.name.fr), " ", h("span", { class: "tag" }, ACTION_TYPES[a.actionType] || a.actionType)),
+          open ? Array.isArray(a.description) ? traitList(a.description) : h("div", { class: "small-text" }, a.description) : null);
+      }));
   };
 
   // --- Onglet Sorts ---
@@ -729,6 +745,8 @@
     concentrationSlot: (d, value) => DND.app.update((ch) => { ch.state.concentrationSlot = { name: ch.state.concentration, level: Number(value) }; }),
     endConcentration: () => DND.app.update((ch) => { ch.state.concentration = ""; }),
     inspiration: () => DND.app.update((ch) => { ch.state.heroicInspiration = !ch.state.heroicInspiration; }),
+    foldCard: (d) => DND.app.update((ch) => { const f = ch.settings.folded = ch.settings.folded || {}; if (f[d.card]) delete f[d.card]; else f[d.card] = true; }),
+    toggleAction: (d) => { const o = DND.app.ui.openActions; o[d.name] = !o[d.name]; DND.app.render(); },
     removeSpell: (d) => DND.app.update((ch) => { ch.spells.splice(Number(d.index), 1); }),
     addCustomSpell: () => {
       const f = DND.app.ui.addSpell;

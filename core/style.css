@@ -151,7 +151,8 @@ button.chip.on .chip-mark { color: #fff; }
 .tag { display: inline-block; margin-left: .35rem; padding: 0 .35rem; border-radius: 4px; background: var(--panel-2); border: 1px solid var(--border); font-size: .72rem; vertical-align: middle; }
 .tag.warn { color: var(--warn); border-color: var(--warn); }
 
-.pips { display: inline-flex; flex-wrap: wrap; gap: .25rem; }
+.pips { display: inline-block; text-wrap: balance; line-height: 0; margin: -.125rem; }
+.pips > * { margin: .125rem; vertical-align: middle; }
 .pip { width: 1.1rem; height: 1.1rem; padding: 0; border-radius: 50%; border: 2px solid var(--pip); background: transparent; }
 .pip.full { background: var(--pip); }
 .pip.full.good { background: var(--good); border-color: var(--good); }
@@ -163,8 +164,9 @@ button.chip.on .chip-mark { color: #fff; }
 .resource-stack > .resource { border-bottom: none; }
 .slot-regain { display: flex; align-items: center; flex-wrap: wrap; gap: .3rem; padding-left: .2rem; }
 .resource > .res-name { flex: 1 1 auto; min-width: 0; }
-.resource > .pips, .resource > .row, .resource > .counter { flex: 0 0 auto; max-width: 60%; justify-content: flex-end; }
+.resource > .pips, .resource > .row, .resource > .counter { flex: 0 0 auto; max-width: 60%; justify-content: flex-end; text-align: right; }
 .hit-dice .resource > .pips { max-width: 75%; }
+.hit-dice .resource > span { white-space: nowrap; }
 .counter { white-space: nowrap; }
 
 table { width: 100%; border-collapse: collapse; }

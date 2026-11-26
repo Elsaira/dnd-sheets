@@ -2,7 +2,7 @@
 
 ## 2026-11-26 : Combat sur deux colonnes en fenêtre étroite
 
-Signalé par Plouf (second écran) : entre 901 et 1100 px, Attaques, Sorts de soutien et Ressources passaient sous Points de vie et Concentration. La grille Combat garde deux colonnes jusqu'à 800 px, la colonne de gauche prend au plus 40 % (29rem max). Sous 900 px, caractéristiques sur une ligne de 6 et Compétences / Valeurs passives / Maîtrises sur deux colonnes en bas (au lieu de cartes fixes de 14rem) ; tout sur une colonne sous 640 px. Tableau des attaques : colonnes Nom/Dégâts plus larges, mots plus coupés au milieu. Dés de vie : jusqu'à 75 % de la ligne pour rester sur une ligne.
+Signalé par Plouf (second écran) : entre 901 et 1100 px, Attaques, Sorts de soutien et Ressources passaient sous Points de vie et Concentration. La grille Combat garde deux colonnes jusqu'à 800 px, la colonne de gauche prend au plus 40 % (29rem max). Sous 900 px, caractéristiques sur une ligne de 6 et Compétences / Valeurs passives / Maîtrises sur deux colonnes en bas (au lieu de cartes fixes de 14rem) ; tout sur une colonne sous 640 px. Tableau des attaques : colonnes Nom/Dégâts plus larges, mots plus coupés au milieu. Dés de vie : jusqu'à 75 % de la ligne. Pastilles réparties à parts égales quand elles passent sur deux lignes (5 + 5 au lieu de 9 + 1, `text-wrap: balance`), demandé par Plouf.
 
 ## 2026-11-15 : Stabilisation en action bonus (Sépulcre)
 

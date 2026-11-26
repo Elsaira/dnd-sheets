@@ -318,7 +318,7 @@
     const bonusParts = (target) => {
       const parts = [];
       for (const x of of("bonus")) {
-        if (x.effect.target !== target) continue;
+        if (x.effect.target !== target || x.effect.weapon) continue;
         if (x.effect.when && !x.effect.when(c)) continue;
         parts.push({ label: x.effect.label || x.source.label, value: Number(val(x.effect.value, x)) || 0 });
       }
@@ -773,6 +773,7 @@
     // weaponAbility : certaines armes peuvent utiliser une autre caractéristique et un dé de dégâts minimal
     // (ex. armes de moine : Dextérité et dé d'Arts martiaux). filter(arme) choisit les armes concernées.
     const weaponOptions = active("weaponAbility");
+    const perWeapon = active("bonus").filter((x) => x.effect.weapon && x.effect.target === "damage.weapon");
     ch.inventory.forEach((item, index) => {
       const w = DND.data.weapons[item.id];
       if (!w) return;
@@ -799,12 +800,16 @@
       const toHit = mod[ability] + (proficient ? pb : 0) + magic + bonus("attack.weapon") + bonus("attack." + w.type) - sheet.d20Penalty;
       const need = w.type === "ranged" ? "dex" : "str";
       if (item.equipped && props.includes("heavy") && c.score[need] < 13) sheet.warnings.push((item.name || w.name.fr) + " (Lourde) : " + DND.data.labels[need].fr + " inférieure à 13, Désavantage aux jets d'attaque.");
+      const others = ch.inventory.filter((it, i) => i !== index && it.equipped && DND.data.weapons[it.id]);
+      const extra = (twoHanded) => perWeapon.filter((x) => x.effect.weapon(w, { item, others, twoHanded, c }));
       const dmgMod = mod[ability] + magic + bonus("damage.weapon") + bonus("damage." + w.type);
-      const fmt = (dice) => dice + (dmgMod ? E.signed(dmgMod) : "");
+      const fmt = (dice, twoHanded) => { const m = dmgMod + extra(twoHanded).reduce((s, x) => s + (Number(sheet.val(x.effect.value, x)) || 0), 0); return dice + (m ? E.signed(m) : ""); };
+      const labels = extra(false).map((x) => x.effect.label || x.source.label);
+      if (labels.length) option = [option].concat(labels).filter(Boolean).join(", ");
       attacks.push({
         kind: "weapon", index, name: item.name || w.name.fr, nameEn: w.name.en, ability, proficient, toHit,
         damage: fmt(dice) + " " + DND.label(w.damageType).toLowerCase(),
-        alt: w.versatile && avg(w.versatile) > avg(dice) ? fmt(w.versatile) + " à 2 mains" : null,
+        alt: w.versatile && avg(w.versatile) > avg(dice) ? fmt(w.versatile, true) + " à 2 mains" : null,
         range: w.range ? E.meters(w.range[0]) + "/" + E.meters(w.range[1]) : props.includes("reach") ? E.meters(10) : E.meters(5),
         props: props.map((p) => DND.label("prop." + p)),
         mastery: w.mastery && prof["mastery." + w.id] ? DND.data.masteries[w.mastery] : null,

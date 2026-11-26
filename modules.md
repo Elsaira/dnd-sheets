@@ -56,7 +56,7 @@ Limites connues :
 - Formation aux armures (prérequis) : vue via les maîtrises de classe et les dons Protection légère/intermédiaire/lourde seulement.
 - Résilient : la fiche ne bloque pas une caractéristique dont le JS est déjà maîtrisé.
 - Esprit affûté / Observateur : le joueur choisit « maîtrise » ou « expertise (déjà maîtrisée) ».
-- Les styles de combat ne sont proposés que par l'aptitude Style de combat (Guerrier, Paladin… à venir) ; Défense (+1 CA en armure) et Archerie (+2 attaque à distance) sont calculés.
+- Les styles de combat ne sont proposés que par l'aptitude Style de combat (Guerrier, Paladin… à venir) ; Défense (+1 CA en armure), Archerie (+2 attaque à distance), Duel (+2 dégâts, une arme de corps à corps à une main et aucune autre arme équipée) et Arme de lancer (+2 dégâts des armes à distance avec Lancer) sont calculés.
 - Détection des pensées (Télépathe) est ajouté au catalogue des sorts par le module du don.
 
 ### Dons d'origine
@@ -124,12 +124,12 @@ Limites connues :
 | Don | Prérequis | Ce que la fiche calcule (le reste en texte) |
 |---|---|---|
 | Archerie (Archery) | — | attaque à distance |
-| Arme de lancer (Thrown Weapon Fighting) | — | texte |
+| Arme de lancer (Thrown Weapon Fighting) | — | +2 dégâts calculé (armes à distance Lancer), rappel pour les armes de corps à corps lancées |
 | Arme à deux mains (Great Weapon Fighting) | — | texte |
 | Combat en aveugle (Blind Fighting) | — | sens |
 | Combat à deux armes (Two-Weapon Fighting) | — | texte |
 | Combat à mains nues (Unarmed Fighting) | — | texte |
-| Duel (Dueling) | — | texte |
+| Duel (Dueling) | — | +2 dégâts calculé |
 | Défense (Defense) | — | CA |
 | Interception (Interception) | — | action sur la fiche |
 | Protection (Protection) | — | action sur la fiche |

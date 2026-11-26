@@ -1,5 +1,9 @@
 # Journal de développement : fiches D&D 5.5 (règles 2024)
 
+## 2026-11-26 : Duel et Arme de lancer ajoutés aux dégâts
+
+Demandé par Plouf (le joueur Guerrier). Nouvelle option générique de l'effet `bonus` : `weapon: (arme, { item, others, twoHanded, c }) => bool` limite le bonus à certaines attaques d'arme (`others` = autres armes équipées, le bouclier n'en est pas une ; `twoHanded` vrai pour les dégâts « à 2 mains » d'une arme polyvalente). Duel : +2 aux dégâts d'une arme de corps à corps ni à deux mains ni tenue à deux mains, si aucune autre arme n'est équipée. Arme de lancer : +2 aux armes à distance avec Lancer (fléchettes) ; pour une arme de corps à corps lancée (dague, javeline), le +2 reste un rappel. L'étiquette du style s'affiche sur l'attaque et le jet copié pour Dice Maiden inclut le bonus. Archerie et Défense étaient déjà calculés ; Arme à deux mains et Combat à deux armes restent des rappels (pas de ligne d'attaque adaptée).
+
 ## 2026-11-26 : Jets de concentration dans la carte Concentration
 
 Demandé par Plouf (la fenêtre après des dégâts disparaissait). Chaque coup subi pendant une concentration ajoute un jet en attente dans la carte : DD = max(10, dégâts / 2) arrondi à l'inférieur, 30 au plus, affiché « JS Con +2 A DD 10 » (bonus de JS de Constitution, pastille A si un avantage s'applique), boutons N / A / D toujours visibles, ✓ (réussi, retire le jet) et ✗ (échoué, fin de la concentration). État : `ch.state.concentrationChecks` (liste de DD), vidé à la fin de la concentration et à 0 PV. Calcul : `sheet.concentrationSave` = JS de Con + effets `bonus`/`advantage` de cible générique `save.con.concentration`. Mage de guerre (avant : avantage à tous les JS de Con, faux) et Esprit occulte (avant : simple note) utilisent cette cible. Champ de saisie du sort rétréci pour que le bouton Fin ne déborde plus à 1060 px.

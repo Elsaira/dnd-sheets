@@ -2,7 +2,7 @@
 
 ## 2026-11-26 : Conduit divin dans l'onglet Sorts
 
-Demandé par Plouf : les options de Conduit divin (Étincelle divine, Renvoi des morts-vivants, celles du domaine ou du serment) apparaissent aussi dans l'onglet Sorts, dans une carte « Conduit divin » avec les cases d'utilisation. Option générique `spellTab: true` sur un effet `resource` : la carte liste toutes les actions qui dépensent cette ressource (`resource` de l'effet `action`), avec leur coût d'action et leur texte calculé ; le préfixe « Conduit divin : » est retiré du texte dans cette carte. Activée pour le Clerc et le Paladin. Nécromancie améliorée (Sépulcre niv. 17) passe de note à action gratuite de Conduit divin. Les actions restent aussi dans « Actions spéciales ». 530 tests.
+Demandé par Plouf : les options de Conduit divin (Étincelle divine, Renvoi des morts-vivants, celles du domaine ou du serment) apparaissent aussi dans l'onglet Sorts, dans une carte « Conduit divin » avec les cases d'utilisation. Option générique `spellTab: true` sur un effet `resource` : la carte liste toutes les actions qui dépensent cette ressource (`resource` de l'effet `action`), avec leur coût d'action et leur texte calculé ; le préfixe « Conduit divin : » est retiré du texte dans cette carte. Activée pour le Clerc et le Paladin. Nécromancie améliorée (Sépulcre niv. 17) passe de note à action gratuite de Conduit divin. Après test de Plouf : ces actions quittent « Actions spéciales » et une carte « Conduit divin » s'ajoute à l'onglet Combat, dans le style de « Sorts de soutien » (cases d'utilisation, nom, coût d'action ; clic sur le nom pour afficher le texte). 530 tests.
 
 ## 2026-11-26 : Remplir le vide sous une carte courte
 

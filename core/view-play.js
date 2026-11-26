@@ -457,8 +457,6 @@
   const resourceText = (r, a) => Array.isArray(a.description) ? a.description.join(" ") : a.description.replace(new RegExp("^" + r.name.fr + "(?: : |, )"), "").replace(/^./, (x) => x.toUpperCase());
   function resourceActionsCard(s, r, all) {
     return h("section", { class: "card support-spells-card" }, h("h3", null, resourceTitle(r, all)),
-      h("div", { class: "resource" }, h("div", { class: "res-name muted small-text" }, RECHARGE[r.recharge] + (r.shortRegain ? " (" + r.shortRegain + " au repos court)" : "")),
-        pips(r.max, r.spent, "resource", { "data-id": r.id })),
       h("ul", { class: "support-spells" }, s.actions.filter((a) => a.resource === r.id).map((a) => {
         const open = DND.app.ui.openActions[a.name.fr];
         return h("li", null,

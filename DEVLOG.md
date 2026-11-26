@@ -2,7 +2,11 @@
 
 ## 2026-11-26 : Jets copiés au format « /roll dice: »
 
-Demandé par Plouf : son ami a trouvé que Dice Maiden accepte un message collé de la forme `/roll dice: 1d20+5`. Les boutons N / A / D et les dés des dégâts copient donc `/roll dice: 1d20+5`, `/roll dice: 2d20 k1+5`, `/roll dice: 2d20 kl1+5`, `/roll dice: 1d8+3` (préfixe ajouté dans core/view-play.js, `E.rollCommand` et `E.diceIn` inchangés). Remplace la règle « jamais /roll » du 2026-11-15. 528 tests.
+Demandé par Plouf : son ami a trouvé que Dice Maiden accepte un message collé de la forme `/roll dice: 1d20+5`. Les boutons N / A / D et les dés des dégâts copient donc `/roll dice: 1d20+5`, `/roll dice: 2d20 k1+5`, `/roll dice: 2d20 kl1+5`, `/roll dice: 1d8+3` (préfixe ajouté dans core/view-play.js, `E.rollCommand` et `E.diceIn` inchangés). Remplace la règle « jamais /roll » du 2026-11-15. 530 tests.
+
+## 2026-11-26 : Conduit divin dans l'onglet Sorts
+
+Demandé par Plouf : les options de Conduit divin (Étincelle divine, Renvoi des morts-vivants, celles du domaine ou du serment) apparaissent aussi dans l'onglet Sorts, dans une carte « Conduit divin » avec les cases d'utilisation. Option générique `spellTab: true` sur un effet `resource` : la carte liste toutes les actions qui dépensent cette ressource (`resource` de l'effet `action`), avec leur coût d'action et leur texte calculé ; le préfixe « Conduit divin : » est retiré du texte dans cette carte. Activée pour le Clerc et le Paladin. Nécromancie améliorée (Sépulcre niv. 17) passe de note à action gratuite de Conduit divin. Après test de Plouf : ces actions quittent « Actions spéciales » et une carte « Conduit divin » s'ajoute à l'onglet Combat, dans le style de « Sorts de soutien » (nom et coût d'action, les cases restent dans « Ressources » ; clic sur le nom pour afficher le texte). 530 tests.
 
 ## 2026-11-26 : Remplir le vide sous une carte courte
 

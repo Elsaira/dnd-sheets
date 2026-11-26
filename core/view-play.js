@@ -23,7 +23,7 @@
         h("button", { class: "primary", "data-action": "mode", "data-mode": "build" }, "Ouvrir la création"));
     }
     // Onglet Sorts seulement si le personnage a des sorts (classe, espèce, don…)
-    const hasSpells = App.sheet.casting.length > 0 || App.sheet.spells.length > 0;
+    const hasSpells = App.sheet.casting.length > 0 || App.sheet.spells.length > 0 || App.sheet.resources.some((r) => r.spellTab);
     const tabs = [["combat", "Combat"], hasSpells && ["spells", "Sorts"], ["features", "Aptitudes"], ["inventory", "Inventaire"], ["notes", "Notes"]].filter(Boolean);
     const content = { combat, spells: hasSpells ? spells : null, features, inventory, notes }[App.ui.tab] || combat;
     return h("div", { class: "play" },
@@ -127,7 +127,7 @@
     const attackCards = [attacks, supports, healing].filter(Boolean);
     const resourceCards = [resourcesCard(s), slotsCard(s)].filter(Boolean);
     const left = [hpCard(App), concentrationCard(App), restCard(s), conditionsCard(ch, s), ...s.companions.map((cp) => companionCard(App, cp))].filter(Boolean);
-    const right = [...attackCards, ...resourceCards, actionsCard(s), notesCard(s)].filter(Boolean);
+    const right = [...attackCards, ...resourceCards, ...tabResources(s).map((r, i, all) => resourceActionsCard(s, r, all)), actionsCard(s), notesCard(s)].filter(Boolean);
     let cols;
     if (ch.settings.layout) {
       const byKey = new Map([...left, ...right].map((c) => [cardKey(c), c]));
@@ -453,6 +453,21 @@
     return spellListCard(s, "Soins", s.spells.filter((sp) => sp.heal), "healing-spells-card");
   }
 
+  const tabResources = (s) => s.resources.filter((r) => r.spellTab);
+  const resourceTitle = (r, all) => r.name.fr + (all.some((o) => o !== r && o.name.fr === r.name.fr) ? " (" + r.source + ")" : "");
+  const resourceText = (r, a) => Array.isArray(a.description) ? a.description.join(" ") : a.description.replace(new RegExp("^" + r.name.fr + "(?: : |, )"), "").replace(/^./, (x) => x.toUpperCase());
+  function resourceActionsCard(s, r, all) {
+    return h("section", { class: "card support-spells-card" }, h("h3", null, resourceTitle(r, all)),
+      h("ul", { class: "support-spells" }, s.actions.filter((a) => a.resource === r.id).map((a) => {
+        const open = DND.app.ui.openActions[a.name.fr];
+        return h("li", null,
+          h("span", { class: "support-spell-name", "data-action": "toggleAction", "data-name": a.name.fr, title: open ? "Masquer le texte" : resourceText(r, a) },
+            actionMarker(a.actionType), h("b", null, a.name.fr)),
+          h("span", { class: "small-text muted" }, ACTION_TYPES[a.actionType] || a.actionType),
+          open ? h("div", { class: "small-text resource-text" }, resourceText(r, a)) : null);
+      })));
+  }
+
   function spellListCard(s, title, spells, className) {
     const sorted = spells.slice().sort((a, b) => a.spell.level - b.spell.level || a.spell.name.fr.localeCompare(b.spell.name.fr));
     if (!sorted.length) return null;
@@ -553,9 +568,10 @@
 
   const ACTION_TYPES = { action: "Action", bonus: "Action bonus", reaction: "Réaction", free: "Gratuite", passive: "Passif" };
   function actionsCard(s) {
-    if (!s.actions.length) return null;
+    const own = new Set(tabResources(s).map((r) => r.id)), list = s.actions.filter((a) => !own.has(a.resource));
+    if (!list.length) return null;
     return h("section", { class: "card" }, h("h3", null, "Actions spéciales"),
-      s.actions.map((a) => {
+      list.map((a) => {
         const open = DND.app.ui.openActions[a.name.fr];
         return h("div", { class: ["action", open && "open"] },
           h("div", { class: "action-head", "data-action": "toggleAction", "data-name": a.name.fr, title: open ? "Masquer le texte" : "Afficher le texte" },
@@ -586,6 +602,15 @@
           addSpellRow(App, c));
       }),
       s.casting.length ? null : h("p", { class: "muted" }, "Pas d'incantation de classe. Les sorts accordés par l'espèce ou les dons apparaissent ci-dessous."),
+      tabResources(s).map((r, i, all) => h("section", { class: "card" },
+        h("h3", null, resourceTitle(r, all)),
+        h("div", { class: "resource" }, h("div", { class: "res-name muted small-text" }, RECHARGE[r.recharge] + (r.shortRegain ? " (" + r.shortRegain + " au repos court)" : "")),
+          pips(r.max, r.spent, "resource", { "data-id": r.id })),
+        h("ul", { class: "spells" }, s.actions.filter((a) => a.resource === r.id).map((a) => h("li", { class: "spell" },
+          h("div", { class: "spell-main" }, actionMarker(a.actionType), h("b", { title: "EN : " + a.name.en }, a.name.fr),
+            h("span", { class: "muted small-text" }, " · " + (ACTION_TYPES[a.actionType] || a.actionType)),
+            Array.isArray(a.description) ? traitList(a.description) : h("div", { class: "small-text" }, resourceText(r, a))),
+          h("div", { class: "spell-side" }, h("small", { class: "muted" }, a.source))))))),
       Object.keys(byLevel).sort((a, b) => a - b).map((lvl) => h("section", { class: "card" },
         h("h3", null, lvl === "0" ? "Tours de magie" : "Niveau " + lvl),
         h("ul", { class: "spells" }, byLevel[lvl].map((sp) => spellRow(App, sp))))),

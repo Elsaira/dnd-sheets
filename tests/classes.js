@@ -120,7 +120,8 @@ module.exports = function (DND, eq) {
   eq("Stabilisation reste une action hors Sépulcre", DND.data.spells["spare-the-dying"].castingTime, "action");
   eq("Tombe 17 : Repousser la mort 1d6, Gardien des âmes 1/repos court, 34 PV", [s.actions.find((a) => a.name.en === "Circle of Mortality").description.includes("+1d6"), res(s, "cleric.keeperOfSouls").max, res(s, "cleric.keeperOfSouls").recharge, res(s, "cleric.keeperOfSouls").description.startsWith("34 ")], [true, 1, "short", true]);
   eq("Sépulcre : intitulés et Empire funeste affichés", [DND.lists["subclass:cleric"].find((x) => x.id === "grave").name.fr, s.actions.find((a) => a.name.en === "Circle of Mortality").description.includes("Empire funeste"), s.actions.find((a) => a.name.en === "Path to the Grave").name.fr], ["Domaine du Sépulcre", true, "Voie du Sépulcre"]);
-  eq("Nécromancie améliorée : détail conservé dans les notes", s.notes.some((x) => /Nécromancie améliorée/.test(x.text)), true);
+  eq("Nécromancie améliorée : option de Conduit divin", s.actions.find((a) => a.name.en === "Improved Necromancy").resource, "cleric.channelDivinity");
+  eq("Conduit divin du clerc dans l'onglet Sorts, avec les options du domaine", [res(s, "cleric.channelDivinity").spellTab, s.actions.filter((a) => a.resource === "cleric.channelDivinity").map((a) => a.name.en)], [true, ["Divine Spark", "Turn Undead", "Path to the Grave", "Improved Necromancy"]]);
   eq("Tombe : pas d'erreur", s.errors, []);
 
   const graveCh = E.newCharacter();
@@ -197,6 +198,7 @@ module.exports = function (DND, eq) {
   eq("Dévotion : sorts du serment niv. 3 et 5", ["shield-of-faith", "zone-of-truth"].every((id) => s.spells.some((x) => x.spell.id === id && x.alwaysPrepared)), true);
   eq("Dévotion : pas encore les sorts du niveau 9", s.spells.some((x) => x.spell.id === "beacon-of-hope"), false);
   eq("Paladin 6 : Conduit divin ×2", res(s, "paladin.channelDivinity").max, 2);
+  eq("Paladin 6 : Conduit divin dans l'onglet Sorts", [res(s, "paladin.channelDivinity").spellTab, s.actions.filter((a) => a.resource === "paladin.channelDivinity").length], [true, 2]);
 
   ch.classes[0].level = 10;
   ch.classes[0].subclass = "glory";

@@ -77,7 +77,7 @@
       { level: 3, id: "channel-divinity", name: { fr: "Conduit divin", en: "Channel Divinity" },
         description: "Deux utilisations (3 au niveau 11) ; une récupérée au repos court, toutes au repos long. Effet de base : Perception divine. DD = DD des sorts de paladin.",
         effects: [
-          { type: "resource", id: "channelDivinity", name: { fr: "Conduit divin", en: "Channel Divinity" }, max: { 3: 2, 11: 3 }, recharge: "long", shortRegain: 1,
+          { type: "resource", id: "channelDivinity", name: { fr: "Conduit divin", en: "Channel Divinity" }, max: { 3: 2, 11: 3 }, recharge: "long", shortRegain: 1, spellTab: true,
             description: "Perception divine et effets du serment." },
           { type: "action", name: { fr: "Perception divine", en: "Divine Sense" }, actionType: "bonus", ...cd,
             description: "Conduit divin : pendant 10 minutes, vous savez où sont les Célestes, Fiélons et Morts-vivants à 18 m, et détectez les lieux ou objets consacrés ou profanés." },

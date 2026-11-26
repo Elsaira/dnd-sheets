@@ -1,5 +1,9 @@
 # Journal de développement : fiches D&D 5.5 (règles 2024)
 
+## 2026-11-26 : Remplir le vide sous une carte courte
+
+Demandé par Plouf : dans une rangée côte à côte, chaque emplacement est maintenant une pile indépendante (`.card-stack`). Glisser une carte dans le vide sous une carte plus courte l'empile dessous ; dans une pile de plusieurs cartes, haut/bas d'une carte = avant/après dans la pile. Format des dispositions : une rangée est un tableau de piles, une pile est un titre ou un tableau de titres (`[["Attaques", "Ressources"], "Sorts de soutien"]`) ; les anciennes dispositions restent valides.
+
 ## 2026-11-26 : Duel et Arme de lancer ajoutés aux dégâts
 
 Demandé par Plouf (le joueur Guerrier). Nouvelle option générique de l'effet `bonus` : `weapon: (arme, { item, others, twoHanded, c }) => bool` limite le bonus à certaines attaques d'arme (`others` = autres armes équipées, le bouclier n'en est pas une ; `twoHanded` vrai pour les dégâts « à 2 mains » d'une arme polyvalente). Duel : +2 aux dégâts d'une arme de corps à corps ni à deux mains ni tenue à deux mains, si aucune autre arme n'est équipée. Arme de lancer : +2 aux armes à distance avec Lancer (fléchettes) ; pour une arme de corps à corps lancée (dague, javeline), le +2 reste un rappel. L'étiquette du style s'affiche sur l'attaque et le jet copié pour Dice Maiden inclut le bonus. Au survol des cellules Attaque et Dégâts (et des boutons de jet), le détail du calcul s'affiche, ex. « 1d8 arme + 3 FOR + 2 Duel » (`E.detail`, champs `hitInfo`, `dmgInfo`, `altInfo` des attaques). Archerie et Défense étaient déjà calculés ; Arme à deux mains et Combat à deux armes restent des rappels (pas de ligne d'attaque adaptée).

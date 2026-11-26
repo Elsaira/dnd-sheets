@@ -38,13 +38,13 @@
 
   function arrange(ch, tab, root) {
     const name = "layout-" + tab, kids = [...root.children], cards = kids.filter((c) => c.matches("section.card"));
-    const layout = ch.settings[name] ? ch.settings[name][0] : [], order = layout.flat();
+    const layout = ch.settings[name] ? ch.settings[name][0] : [], order = layout.flat(2);
     const rank = (c) => { const i = order.indexOf(cardKey(c)); return i < 0 ? order.length + cards.indexOf(c) : i; };
     const sorted = cards.slice().sort((a, b) => rank(a) - rank(b));
     root.replaceChildren(...kids.map((c) => (cards.includes(c) ? sorted.shift() : c)));
-    for (const keys of layout.filter(Array.isArray)) {
-      const group = cards.filter((c) => keys.includes(cardKey(c))).sort((a, b) => rank(a) - rank(b));
-      if (group.length > 1) { const row = h("div", { class: "card-row" }); group[0].before(row); row.append(...group); }
+    for (const item of layout.filter(Array.isArray)) {
+      const stacks = item.map((st) => cards.filter((c) => [].concat(st).includes(cardKey(c))).sort((a, b) => rank(a) - rank(b))).filter((st) => st.length);
+      if (stacks.length > 1) { const row = cardRow([]); stacks[0][0].before(row); row.append(...cardRow(stacks).children); }
     }
     if (ch.settings[name]) root.append(h("div", { class: "row end" }, h("button", { class: "small", "data-action": "resetLayout", "data-layout": name }, "Disposition par défaut")));
     root.classList.add("card-col");
@@ -130,13 +130,18 @@
     let cols;
     if (ch.settings.layout) {
       const byKey = new Map([...left, ...right].map((c) => [cardKey(c), c]));
-      const unit = (it) => { const cs = [].concat(it).map((k) => byKey.get(k)).filter(Boolean); cs.forEach((c) => byKey.delete(cardKey(c))); return cs.length > 1 ? h("div", { class: "card-row" }, cs) : cs[0]; };
-      cols = ch.settings.layout.map((items) => items.map(unit).filter(Boolean));
+      const take = (k) => { const c = byKey.get(k); byKey.delete(k); return c; };
+      const unit = (it) => {
+        if (!Array.isArray(it)) return [take(it)];
+        const stacks = it.map((st) => [].concat(st).map(take).filter(Boolean)).filter((st) => st.length);
+        return stacks.length > 1 ? [cardRow(stacks)] : stacks.flat();
+      };
+      cols = ch.settings.layout.map((items) => items.flatMap(unit).filter(Boolean));
       for (const c of byKey.values()) cols[left.includes(c) ? 0 : 1].push(c);
       cols[1].push(h("div", { class: "row end" }, h("button", { class: "small", "data-action": "resetLayout", "data-layout": "layout" }, "Disposition par défaut")));
     } else {
       const attackPair = attackCards.length > 1 ? h("div", { class: ["attack-support-pair", supports && healing && "support-healing-grid"] }, attackCards) : attackCards[0];
-      cols = [left, [attackPair, resourceCards.length ? h("div", { class: ["resource-pair", resourceCards.length > 1 && "card-row"] }, resourceCards) : null, ...right.slice(attackCards.length + resourceCards.length)]];
+      cols = [left, [attackPair, resourceCards.length ? (resourceCards.length > 1 ? cardRow(resourceCards.map((c) => [c]), "resource-pair") : resourceCards[0]) : null, ...right.slice(attackCards.length + resourceCards.length)]];
     }
     return foldCards(ch, h("div", { class: "grid2 combat-grid", "data-layout": "layout" }, cols.map((c) => h("div", { class: "combat-col card-col" }, c))), "");
   }
@@ -158,11 +163,14 @@
   }
 
   let drag = null;
-  const unitOf = (c) => (c.parentNode.matches(".card-row") ? c.parentNode : c);
+  const cardRow = (stacks, cls) => h("div", { class: ["card-row", cls] }, stacks.map((st) => h("div", { class: "card-stack" }, st)));
+  const unitOf = (c) => c.closest(".card-row") || c;
   function detach(el) {
-    const p = el.parentNode;
+    const st = el.parentNode, row = st.closest(".card-row");
     el.remove();
-    if (p.matches(".card-row") && p.children.length < 2) p.firstElementChild ? p.replaceWith(p.firstElementChild) : p.remove();
+    if (!row) return;
+    if (!st.children.length) st.remove();
+    if (row.children.length < 2) row.replaceWith(...row.querySelectorAll("section.card"));
   }
   function flip(box, change) {
     const els = [...box.querySelectorAll("section.card")], was = new Map(els.map((e) => [e, e.getBoundingClientRect()]));
@@ -176,17 +184,22 @@
   function placeAt(target, mode, col) {
     const el = drag.el;
     detach(el);
+    if (mode === "stack") return target.append(el);
     if (!target) return col.insertBefore(el, col.querySelector(":scope > .row.end"));
-    if (mode === "before" || mode === "after") return unitOf(target)[mode](el);
-    let row = target.parentNode;
-    if (!row.matches(".card-row")) { row = h("div", { class: "card-row" }); target.replaceWith(row); row.append(target); }
-    target[mode === "left" ? "before" : "after"](el);
+    const st = target.closest(".card-stack");
+    if (mode === "before" || mode === "after") return (st && st.children.length > 1 ? target : unitOf(target))[mode](el);
+    const side = mode === "left" ? "before" : "after";
+    if (st) return st[side](cardRow([[el]]).firstChild);
+    const row = cardRow([[]]);
+    target.replaceWith(row);
+    row.firstChild.append(target);
+    row.firstChild[side](cardRow([[el]]).firstChild);
   }
   const layoutOf = (box) => (box.matches(".card-col") ? [box] : [...box.querySelectorAll(".card-col")]).map((col) => [...col.children].flatMap((el) => {
     if (el.matches("section.card")) return [cardKey(el)];
     if (!el.matches(".card-row")) return [...el.querySelectorAll("section.card")].map(cardKey);
-    const keys = [...el.querySelectorAll(":scope > section.card")].map(cardKey);
-    return keys.length > 1 ? [keys] : keys;
+    const stacks = [...el.children].map((st) => [...st.querySelectorAll(":scope > section.card")].map(cardKey)).filter((st) => st.length);
+    return stacks.length > 1 ? [stacks.map((st) => (st.length > 1 ? st : st[0]))] : stacks.flat();
   }));
   document.addEventListener("dragstart", (ev) => {
     const t = ev.target.closest && ev.target.closest(".card-col section.card > h3");
@@ -205,15 +218,19 @@
     if (Date.now() < drag.busy) return;
     let target = ev.target.closest("section.card"), mode = "end";
     if (target && (target === drag.el || drag.el.contains(target) || !col.contains(target))) return;
-    if (target) {
-      const r = target.getBoundingClientRect(), x = (ev.clientX - r.left) / r.width;
-      const full = target.parentNode.matches(".card-row") && target.parentNode.children.length >= 3 && target.parentNode !== drag.el.parentNode;
+    const stack = !target && ev.target.closest(".card-stack");
+    if (stack) {
+      if (!col.contains(stack) || stack.lastElementChild === drag.el) return;
+      target = stack; mode = "stack";
+    } else if (target) {
+      const r = target.getBoundingClientRect(), x = (ev.clientX - r.left) / r.width, row = target.closest(".card-row");
+      const full = row && row.children.length >= 3 && !row.contains(drag.el);
       mode = !full && x < 0.2 ? "left" : !full && x > 0.8 ? "right" : ev.clientY < r.top + r.height / 2 ? "before" : "after";
     } else {
       const last = [...col.children].filter((e) => !e.matches(".row.end")).pop();
       if (last && ev.clientY < last.getBoundingClientRect().bottom) return;
     }
-    const key = (target ? cardKey(target) : "") + mode + [...document.querySelectorAll(".card-col")].indexOf(col);
+    const key = (target ? (stack ? [...document.querySelectorAll(".card-stack")].indexOf(stack) : cardKey(target)) : "") + mode + [...document.querySelectorAll(".card-col")].indexOf(col);
     if (key === drag.last) return;
     if (mode === "left" || mode === "right") {
       if (drag.wait !== key) { drag.wait = key; drag.since = Date.now(); return; }

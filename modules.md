@@ -159,6 +159,7 @@ AideDD n'était pas accessible au début du développement. Reste à confirmer :
 - Format des liens AideDD pour les sorts 2024 : confirmé, les 106 liens ouvrent la bonne page.
 
 ## Rappels en jeu et avantages contre les états
+- Dons rappelés dans Actions spéciales (2026-11-26) : ceux qui ont une action/réaction déclarée, plus Comédien, Chef cuisinier, Guérisseur, Esprit affûté, Observateur, Maître des boucliers et 6 faveurs épiques via `combat`.
 - Une aptitude utile en partie mais sans calcul porte `combat: "texte court"` (ou `combat: true` pour reprendre sa description) : elle apparaît en « Passif » dans Actions spéciales (onglet Combat).
 - Avantage aux JS contre un état : effet `{ type: "advantage", target: "condition.<id>" }` → ★ sur l'état. Immunité : `{ type: "immunity", condition: "<id>", note }` → ◆. Ids : ceux de `DND.data.conditions` (charmed, frightened, poisoned, stunned…).
 - Objet libre : le joueur l'ajoute lui-même dans la carte États (« Avantages contre un état venant d'un objet »).

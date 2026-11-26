@@ -5,7 +5,7 @@ registerModule({
   description: "+1 Int. Octroie maîtrise/expertise en Arcanes, Histoire, Investigation, Nature ou Religion. Action Étude en action Bonus",
   prerequisite: DND.feat.requires({ level: 4, scores: ["int"] }, "Niveau 4, Intelligence 13"),
   features: [
-    { id: "keen-mind", name: { fr: "Esprit affûté", en: "Keen Mind" },
+    { id: "keen-mind", combat: "Action Étude en action Bonus.", name: { fr: "Esprit affûté", en: "Keen Mind" },
       description: "Érudition : Choisissez l'une des compétences suivantes : Arcanes, Histoire, Investigation, Nature ou Religion. Si vous ne maîtrisez pas la compétence choisie, vous la maîtrisez ; si vous la maîtrisez déjà, vous gagnez Expertise pour celle-ci. Étude rapide : Vous pouvez prendre l'action Étude en tant qu'action Bonus.",
       effects: [
         DND.feat.ability(["int"]),

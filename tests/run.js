@@ -405,6 +405,12 @@ eq("Défense : rien sans armure", E.compute(ch).ac.parts.some((p) => p.label ===
 ch.feats = [{ id: "boon-of-fortitude", choices: { ability: ["con"] } }];
 eq("Faveur de vigueur bloquée avant le niveau 19", DND.modules.feat["boon-of-fortitude"].prerequisite(E.compute(ch).context), "Niveau 19");
 eq("Nombre total de dons", Object.keys(DND.modules.feat).length, 75);
+ch.feats = [{ id: "actor", choices: {} }, { id: "chef", choices: { ability: ["con"] } }, { id: "magic-initiate", choices: {} }];
+s = E.compute(ch);
+const featLine = (fr) => s.actions.find((a) => a.name.fr === fr && a.actionType === "passive");
+eq("Comédien dans les actions spéciales avec DD", /Intuition DD \d+/.test((featLine("Comédien") || {}).description), true);
+eq("Chef cuisinier : PV temporaires = bonus de maîtrise", /gagne \d+ PV temporaires/.test((featLine("Chef cuisinier") || {}).description), true);
+eq("Initié à la magie absent des actions spéciales", !!featLine("Initié à la magie"), false);
 
 // Guerrier, Clerc, Paladin, Ensorceleur, Artificier : tests/classes.js
 require("./classes.js")(DND, eq);

@@ -1,5 +1,9 @@
 # Journal de développement : fiches D&D 5.5 (règles 2024)
 
+## 2026-11-26 : Cartes Combat déplaçables
+
+Demandé par Plouf. Le titre de chaque carte de l'onglet Combat se glisse-dépose vers l'autre colonne ou à une autre place (trait de couleur = point d'arrivée). Disposition mémorisée par personnage dans `ch.settings.layout` (deux listes de titres) ; une carte nouvelle ou absente de la liste reprend sa colonne par défaut. Bouton « Disposition par défaut » sous la colonne de droite pour revenir à la mise en page d'origine (avec Ressources/Emplacements côte à côte).
+
 ## 2026-11-26 : Page Combat repliable
 
 Demandé par Plouf (la page s'allonge avec les niveaux). Actions spéciales : une ligne par aptitude (nom + type), clic pour afficher le texte (`App.ui.openActions`, non sauvegardé). Toutes les cartes de l'onglet Combat sauf Points de vie se replient en cliquant leur titre ; mémorisé par personnage dans `ch.settings.folded` (clé = titre de la carte).

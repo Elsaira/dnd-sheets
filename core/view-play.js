@@ -6,12 +6,12 @@
   DND.views = DND.views || {};
   const sg = E.signed;
   const en = (text) => (text ? "EN : " + text : null);
-  const rolls = (bonus, label, hint) => h("span", { class: "rolls" }, [["N", "", "normal"], ["A", "adv", "avec avantage"], ["D", "dis", "avec désavantage"]].map(([t, mode, text]) =>
+  const rolls = (bonus, label, hint, info) => h("span", { class: "rolls" }, [["N", "", "normal"], ["A", "adv", "avec avantage"], ["D", "dis", "avec désavantage"]].map(([t, mode, text]) =>
     h("button", { class: ["roll", "roll-" + t, hint === t && "hint"], "data-action": "roll", "data-roll": E.rollCommand(bonus, mode),
-      title: label + " " + text + " : copier « " + E.rollCommand(bonus, mode) + " »" }, t)));
-  const damageRoll = (text, label) => {
+      title: label + " " + text + " : copier « " + E.rollCommand(bonus, mode) + " »" + (info ? "\n" + info : "") }, t)));
+  const damageRoll = (text, label, info) => {
     const d = E.diceIn(text);
-    return d ? [text.slice(0, d.index), h("button", { class: "roll-dmg", "data-action": "roll", "data-roll": d.command, title: "Dégâts de " + label + " : copier « " + d.command + " »" }, d.text), text.slice(d.index + d.text.length)] : text;
+    return d ? [text.slice(0, d.index), h("button", { class: "roll-dmg", "data-action": "roll", "data-roll": d.command, title: "Dégâts de " + label + " : copier « " + d.command + " »" + (info ? "\n" + info : "") }, d.text), text.slice(d.index + d.text.length)] : text;
   };
 
   DND.views.play = function (App) {
@@ -422,8 +422,8 @@
             a.kind === "weapon" && !a.proficient ? h("span", { class: "tag warn", title: "Arme non maîtrisée" }, "non maîtrisée") : null,
             a.bond ? h("span", { class: "tag", title: a.bond }, s.weaponBond ? s.weaponBond.column : "Pacte") : null,
             a.option ? h("span", { class: "tag", title: "Dégâts et caractéristique calculés avec " + a.option }, a.option) : null),
-          h("td", null, a.toHit != null ? [sg(a.toHit), rolls(a.toHit, "Attaque " + a.name)] : a.save ? h("span", { class: ["ability-color", "ability-" + a.save.ability] }, "JS " + DND.data.labels[a.save.ability].short + " " + a.save.dc) : "—"),
-          h("td", null, damageRoll(a.damage, a.name), a.alt ? h("small", { class: "muted" }, " (", damageRoll(a.alt, a.name), ")") : null),
+          h("td", { title: a.hitInfo }, a.toHit != null ? [sg(a.toHit), rolls(a.toHit, "Attaque " + a.name, null, a.hitInfo)] : a.save ? h("span", { class: ["ability-color", "ability-" + a.save.ability] }, "JS " + DND.data.labels[a.save.ability].short + " " + a.save.dc) : "—"),
+          h("td", { title: a.dmgInfo }, damageRoll(a.damage, a.name, a.dmgInfo), a.alt ? h("small", { class: "muted", title: a.altInfo }, " (", damageRoll(a.alt, a.name, a.altInfo), ")") : null),
           h("td", null, a.range))))));
   }
 

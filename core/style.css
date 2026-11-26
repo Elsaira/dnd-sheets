@@ -197,6 +197,15 @@ tr.dim td { opacity: .6; }
 .feature { padding: .3rem 0; border-bottom: 1px dashed var(--border); }
 .feature:last-child { border-bottom: none; }
 .action { padding: .3rem 0; }
+.action-head { cursor: pointer; }
+.action-head::before { content: "▸"; display: inline-block; width: .9rem; color: var(--muted); }
+.action.open .action-head::before { content: "▾"; }
+.action > :not(.action-head) { margin-left: .9rem; }
+.fold-head { cursor: pointer; display: flex; justify-content: space-between; }
+.fold-head::after { content: "▾"; color: var(--muted); }
+.folded > .fold-head::after { content: "▸"; }
+.card.folded { padding-bottom: .5rem; }
+.card.folded > h3, html.paper .card.folded > h3 { margin: 0; border-bottom: none; padding-bottom: 0; }
 
 .choice-group { margin-bottom: .8rem; }
 .choice { padding: .45rem 0; border-bottom: 1px dashed var(--border); }

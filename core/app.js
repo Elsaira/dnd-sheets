@@ -6,7 +6,7 @@
   const App = {
     ch: null,
     sheet: null,
-    ui: { mode: "play", tab: "combat", modal: null, toast: "", amount: "", addSpell: {}, addItem: "", search: {} },
+    ui: { mode: "play", tab: "combat", modal: null, toast: "", amount: "", addSpell: {}, addItem: "", search: {}, openActions: {} },
   };
   DND.app = App;
 

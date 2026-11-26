@@ -1,5 +1,9 @@
 # Journal de développement : fiches D&D 5.5 (règles 2024)
 
+## 2026-11-26 : Cartes repliables et déplaçables dans tous les onglets
+
+Demandé par Plouf. Sorts, Aptitudes, Inventaire et Notes : clic sur le titre d'une carte pour la replier, glisser le titre pour la déplacer (une colonne). Ordre mémorisé par personnage dans `ch.settings["layout-<onglet>"]`, cartes repliées dans `ch.settings.folded` avec la clé `<onglet>:<titre>` (Combat garde `layout` et ses clés sans préfixe, donc les anciennes sauvegardes restent valables). Bouton « Disposition par défaut » en bas de l'onglet quand l'ordre a été changé.
+
 ## 2026-11-26 : Thème « Gris sombre » (à tester)
 
 Demandé par Plouf. Options > Thème : Kraft (défaut) ou Gris sombre. Mémorisé dans ce navigateur (`localStorage` `theme`), pas dans le personnage. Le thème gris ne fait que redéfinir les variables de couleur sous `html[data-theme="grey"]` : fonds gris, texte clair, couleur de classe éclaircie (texte sombre dessus), couleurs des caractéristiques, vert/rouge/orange éclaircis pour rester lisibles sur fond sombre. Pastilles de coût d'action inchangées.

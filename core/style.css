@@ -274,6 +274,8 @@ tr.dim td { opacity: .6; }
 .rule { margin: .4rem 0 0; padding-left: 1.1rem; }
 .rule li { margin: .15rem 0; }
 .conc-duration { margin-top: .4rem; justify-content: space-between; }
+.conc-check { margin-top: .4rem; gap: .3rem; flex-wrap: nowrap; } .conc-check .rolls { visibility: visible; margin: 0; } .conc-check .nowrap { white-space: nowrap; }
+.row > input.grow { min-width: 0; }
 .card.concentrating { border-color: var(--accent); box-shadow: inset 3px 0 0 var(--accent); }
 button.on { background: var(--accent); color: var(--accent-text); border-color: var(--accent); }
 .tag.comp { font-weight: 700; min-width: 1.1rem; text-align: center; }

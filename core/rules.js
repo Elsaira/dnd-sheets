@@ -36,8 +36,9 @@
     if (st.concentration && now === 0) {
       messages.push("Concentration (" + st.concentration + ") perdue.");
       st.concentration = "";
+      st.concentrationChecks = [];
     } else if (st.concentration) {
-      messages.push("Concentration (" + st.concentration + ") : JS de Constitution DD " + Math.min(30, Math.max(10, Math.floor(amount / 2))) + ".");
+      (st.concentrationChecks = st.concentrationChecks || []).push(Math.min(30, Math.max(10, Math.floor(amount / 2))));
     }
     return messages.join(" ");
   };

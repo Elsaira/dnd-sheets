@@ -281,10 +281,18 @@
         h("span", null, "Durée : ", h("b", null, info.noConcentration ? info.duration + " (sans concentration)" : "jusqu'à " + info.duration.toLowerCase())),
         info.levels.length ? h("select", { "data-change": "concentrationSlot", value: info.level, "aria-label": "Niveau de l'emplacement utilisé", title: "Niveau de l'emplacement utilisé" },
           info.levels.map((l) => h("option", { value: l }, "Emplacement niv. " + l))) : null) : null,
+      st.concentration ? (st.concentrationChecks || []).map((dc, i) => {
+        const cs = App.sheet.concentrationSave, adv = cs.advantage.length;
+        return h("div", { class: "row conc-check", title: adv ? "Avantage : " + cs.advantage.join(", ") : null },
+          h("span", { class: "grow nowrap" }, "JS Con " + sg(cs.bonus), adv ? h("span", { class: "adv" }, " A") : null, " ", h("b", null, "DD " + dc)),
+          rolls(cs.bonus, "JS de Concentration", adv ? "A" : null),
+          h("button", { class: "small", "data-action": "concentrationCheck", "data-i": i, title: "Réussi : retirer ce jet" }, "✓"),
+          h("button", { class: "small danger", "data-action": "endConcentration", title: "Échoué : fin de la concentration" }, "✗"));
+      }) : null,
       h("ul", { class: "rule small-text" },
         h("li", null, "Dégâts subis : JS de Constitution, DD 10 ou la moitié des dégâts si c'est plus (DD 30 max). Un jet par source de dégâts."),
         h("li", null, "Fin de la concentration : vous lancez un autre sort à concentration, vous êtes Neutralisé ou vous mourez. Vous pouvez y mettre fin à tout moment (sans action)."),
-        h("li", { class: "muted" }, "Le bouton Dégâts indique le DD du jet quand un sort est en cours.")));
+        h("li", { class: "muted" }, "Le bouton Dégâts ajoute ici le jet à faire quand un sort est en cours.")));
   }
 
   // Jets contre la mort : affichés seulement à 0 PV ; remis à zéro par les soins et le repos long
@@ -840,7 +848,8 @@
     }),
     spendHitDie: (d) => DND.app.update((ch, s) => R.spendHitDie(ch, s, d.die)),
     hitDie: (d) => DND.app.update((ch, s) => R.adjustHitDie(ch, s, d.die, Number(d.delta))),
-    concentrate: (d) => DND.app.update((ch) => { ch.state.concentration = ch.state.concentration === d.name ? "" : d.name; }),
+    concentrate: (d) => DND.app.update((ch) => { ch.state.concentration = ch.state.concentration === d.name ? "" : d.name; ch.state.concentrationChecks = []; }),
+    concentrationCheck: (d) => DND.app.update((ch) => { ch.state.concentrationChecks.splice(Number(d.i), 1); }),
     attunementMax: (d, value, el) => DND.app.update((ch) => { ch.settings.attunementMax = el.value === "" ? "" : Math.max(0, Math.round(Number(el.value))); }),
     itemWeight: (d, value, el) => DND.app.update((ch) => { ch.inventory[Number(d.index)].weight = el.value === "" ? "" : round(Number(el.value) * 2); }),
     shortRest: () => { DND.app.ui.modal = null; DND.app.update((ch, s) => R.shortRest(ch, s)); },
@@ -855,7 +864,7 @@
     removeConditionDefense: (d) => DND.app.update((ch) => { ch.conditionDefenses.splice(Number(d.index), 1); }),
     exhaustion: (d) => DND.app.update((ch) => { ch.state.exhaustion = Math.max(0, Math.min(6, ch.state.exhaustion + Number(d.delta))); }),
     concentrationSlot: (d, value) => DND.app.update((ch) => { ch.state.concentrationSlot = { name: ch.state.concentration, level: Number(value) }; }),
-    endConcentration: () => DND.app.update((ch) => { ch.state.concentration = ""; }),
+    endConcentration: () => DND.app.update((ch) => { ch.state.concentration = ""; ch.state.concentrationChecks = []; }),
     inspiration: () => DND.app.update((ch) => { ch.state.heroicInspiration = !ch.state.heroicInspiration; }),
     resetLayout: (d) => DND.app.update((ch) => { delete ch.settings[d.layout]; }),
     foldCard: (d) => DND.app.update((ch) => { const f = ch.settings.folded = ch.settings.folded || {}; if (f[d.card]) delete f[d.card]; else f[d.card] = true; }),

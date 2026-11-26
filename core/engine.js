@@ -54,7 +54,7 @@
     ch.notes = Object.assign({ personality: "", appearance: "", backstory: "", allies: "", session: "" }, ch.notes);
     ch.state = Object.assign({
       damage: 0, tempHp: 0, hitDiceSpent: {}, slotsSpent: {}, pactSpent: 0, resources: {},
-      conditions: [], exhaustion: 0, concentration: "", heroicInspiration: false,
+      conditions: [], exhaustion: 0, concentration: "", concentrationChecks: [], heroicInspiration: false,
       deathSaves: { success: 0, failure: 0 }, companions: {}, slotsExtra: {},
     }, ch.state);
     return ch;
@@ -351,6 +351,8 @@
           advantage: advantages("save." + a).concat(advantages("save.all")) },
       };
     }
+
+    sheet.concentrationSave = { bonus: sheet.abilities.con.save.bonus + bonus("save.con.concentration"), advantage: sheet.abilities.con.save.advantage.concat(advantages("save.con.concentration")) };
 
     sheet.skills = {};
     for (const [id, s] of Object.entries(DND.data.skills)) {

@@ -63,7 +63,7 @@
       { level: 2, id: "channel-divinity", name: { fr: "Conduit divin", en: "Channel Divinity" },
         description: "Deux utilisations (3 au niveau 6, 4 au niveau 18) ; une récupérée au repos court, toutes au repos long. Effets : Étincelle divine et Renvoi des morts-vivants, plus ceux du domaine. DD = DD des sorts de clerc.",
         effects: [
-          { type: "resource", id: "channelDivinity", name: { fr: "Conduit divin", en: "Channel Divinity" }, max: { 2: 2, 6: 3, 18: 4 }, recharge: "long", shortRegain: 1,
+          { type: "resource", id: "channelDivinity", name: { fr: "Conduit divin", en: "Channel Divinity" }, max: { 2: 2, 6: 3, 18: 4 }, recharge: "long", shortRegain: 1, spellTab: true,
             description: "Étincelle divine, Renvoi des morts-vivants et effets du domaine." },
           { type: "action", name: { fr: "Étincelle divine", en: "Divine Spark" }, actionType: "action", ...cd,
             description: (c) => { const n = DND.byLevel({ 1: 1, 7: 2, 13: 3, 18: 4 }, lvl(c));

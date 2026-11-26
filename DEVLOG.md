@@ -1,5 +1,9 @@
 # Journal de développement : fiches D&D 5.5 (règles 2024)
 
+## 2026-11-26 : Conduit divin dans l'onglet Sorts
+
+Demandé par Plouf : les options de Conduit divin (Étincelle divine, Renvoi des morts-vivants, celles du domaine ou du serment) apparaissent aussi dans l'onglet Sorts, dans une carte « Conduit divin » avec les cases d'utilisation. Option générique `spellTab: true` sur un effet `resource` : la carte liste toutes les actions qui dépensent cette ressource (`resource` de l'effet `action`), avec leur coût d'action et leur texte calculé ; le préfixe « Conduit divin : » est retiré du texte dans cette carte. Activée pour le Clerc et le Paladin. Nécromancie améliorée (Sépulcre niv. 17) passe de note à action gratuite de Conduit divin. Après test de Plouf : ces actions quittent « Actions spéciales » et une carte « Conduit divin » s'ajoute à l'onglet Combat, dans le style de « Sorts de soutien » (nom et coût d'action, les cases restent dans « Ressources » ; clic sur le nom pour afficher le texte). 530 tests.
+
 ## 2026-11-26 : Remplir le vide sous une carte courte
 
 Demandé par Plouf : dans une rangée côte à côte, chaque emplacement est maintenant une pile indépendante (`.card-stack`). Glisser une carte dans le vide sous une carte plus courte l'empile dessous ; dans une pile de plusieurs cartes, haut/bas d'une carte = avant/après dans la pile. Format des dispositions : une rangée est un tableau de piles, une pile est un titre ou un tableau de titres (`[["Attaques", "Ressources"], "Sorts de soutien"]`) ; les anciennes dispositions restent valides.

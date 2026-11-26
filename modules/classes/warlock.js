@@ -86,7 +86,7 @@
       effects: [{ type: "sense", sense: "devils-sight", range: 120 }] },
     { id: "eldritch-mind", name: { fr: "Esprit occulte", en: "Eldritch Mind" },
       description: "Avantage aux jets de sauvegarde de Constitution pour maintenir la concentration.",
-      effects: [{ type: "note", text: "Avantage aux JS de Constitution pour maintenir la concentration." }] },
+      effects: [{ type: "advantage", target: "save.con.concentration", note: "Esprit occulte" }] },
     { id: "eldritch-smite", combat: true, name: { fr: "Châtiment occulte", en: "Eldritch Smite" },
       description: "Quand vous touchez avec l'arme de pacte, dépensez un emplacement de Magie de pacte : +1d8 force, +1d8 par niveau d'emplacement, et la cible peut tomber À terre.",
       prerequisite: needs(5, "pact-of-the-blade", "Pacte de la lame"),

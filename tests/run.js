@@ -85,7 +85,16 @@ eq("PV après dégâts", E.compute(ch).hp.current, s.hp.max - 3);
 ch.classes[0].level = 5;
 eq("Montée de niveau : les PV gagnés s'ajoutent", E.compute(ch).hp.current, E.compute(ch).hp.max - 3);
 ch.classes[0].level = 4;
-eq("Rappel de concentration", /DD 10/.test(msg), true);
+eq("Jet de concentration ajouté à la carte", ch.state.concentrationChecks, [10]);
+ch.state.tempHp = 100;
+DND.rules.damage(ch, s, 70);
+eq("Un jet par coup, DD 30 max", ch.state.concentrationChecks, [10, 30]);
+ch.state.tempHp = 0;
+DND.rules.damage(ch, E.compute(ch), 500);
+eq("Concentration perdue à 0 PV : jets effacés", [ch.state.concentration, ch.state.concentrationChecks], ["", []]);
+ch.state.damage = 3;
+ch.state.deathSaves = { success: 0, failure: 0 };
+ch.state.conditions = [];
 // Jets contre la mort : échec sur dégâts à 0 PV, remise à zéro aux soins et au repos long
 {
   const c = E.newCharacter();
@@ -184,6 +193,9 @@ eq("Décharge occulte niveau 5", s.spells.find((x) => x.spell.id === "eldritch-b
 eq("Armure des ombres (13 + DEX 2)", s.ac.value, 15);
 eq("Sorts du Fiélon niveau 5", ["burning-hands", "fireball", "stinking-cloud"].every((id) => s.spells.some((x) => x.spell.id === id)), true);
 eq("Pas encore Bouclier de feu", s.spells.some((x) => x.spell.id === "fire-shield"), false);
+ch.classes[0].choices.invocations[4] = "eldritch-mind";
+eq("Esprit occulte : avantage aux JS de concentration", E.compute(ch).concentrationSave.advantage, ["Esprit occulte"]);
+ch.classes[0].choices.invocations[4] = "devils-sight";
 eq("Vision du diable 36 m", E.meters(s.senses["devils-sight"]), "36 m");
 eq("Note d'investiture", s.companions[0].notes.length, 1);
 eq("Bénédiction du Ténébreux", s.actions.some((a) => a.actionType === "passive" && /8 PV temporaires/.test(a.description)), true);
@@ -396,6 +408,9 @@ s = E.compute(ch);
 eq("Télépathe : Détection des pensées gratuite (INT)", !!s.spells.find((x) => x.spell.id === "detect-thoughts" && x.freeCast && x.ability === "int"), true);
 eq("Pas d'erreur avec les nouveaux dons", s.errors, []);
 
+ch.feats = [{ id: "war-caster", choices: { ability: ["cha"] } }];
+s = E.compute(ch);
+eq("Mage de guerre : avantage aux JS de concentration seulement", [s.concentrationSave.advantage, s.abilities.con.save.advantage, s.concentrationSave.bonus === s.abilities.con.save.bonus], [["Concentration (Mage de guerre)"], [], true]);
 ch.feats = [{ id: "defense", choices: {} }];
 ch.inventory = [{ id: "leather", qty: 1, equipped: true }];
 s = E.compute(ch);

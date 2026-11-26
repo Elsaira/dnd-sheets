@@ -9,7 +9,7 @@ registerModule({
       description: "Concentration : Vous bénéficiez d'un Avantage aux jets de sauvegarde de Constitution que vous effectuez pour maintenir votre concentration. Sort réactif : Lorsqu'une créature provoque une Attaque d'opportunité de votre part en quittant votre allonge, vous pouvez prendre une Réaction pour lancer un sort sur elle, au lieu d'effectuer une Attaque d'opportunité. Le sort doit avoir un temps d'incantation d'une action et ne doit cibler que cette créature. Composantes somatiques : Vous pouvez exécuter les composantes somatiques des sorts même lorsque vous avez des armes ou un bouclier dans une ou deux mains.",
       effects: [
         DND.feat.ability(["int", "wis", "cha"]),
-        { type: "advantage", target: "save.con", note: "Concentration (Mage de guerre)" },
+        { type: "advantage", target: "save.con.concentration", note: "Concentration (Mage de guerre)" },
       ] },
   ],
 });

@@ -1,5 +1,9 @@
 # Journal de développement : fiches D&D 5.5 (règles 2024)
 
+## 2026-11-26 : Jets de concentration dans la carte Concentration
+
+Demandé par Plouf (la fenêtre après des dégâts disparaissait). Chaque coup subi pendant une concentration ajoute un jet en attente dans la carte : DD = max(10, dégâts / 2) arrondi à l'inférieur, 30 au plus, bonus de JS de Constitution et pastille A si un avantage s'applique, boutons N / A / D toujours visibles, ✓ (réussi, retire le jet) et ✗ (échoué, fin de la concentration). État : `ch.state.concentrationChecks` (liste de DD), vidé à la fin de la concentration et à 0 PV. Calcul : `sheet.concentrationSave` = JS de Con + effets `bonus`/`advantage` de cible générique `save.con.concentration`. Mage de guerre (avant : avantage à tous les JS de Con, faux) et Esprit occulte (avant : simple note) utilisent cette cible. Champ de saisie du sort rétréci pour que le bouton Fin ne déborde plus à 1060 px.
+
 ## 2026-11-26 : Cartes côte à côte et aperçu animé du glisser-déposer
 
 Demandé par Plouf. Pendant le glisser, la carte prend sa future place en direct et les autres glissent (animation FLIP de 160 ms). Lâcher sur le bord gauche ou droit d'une carte (20 % de sa largeur, après 0,3 s) la met côte à côte avec elle, 3 cartes au plus par ligne ; haut/bas = avant/après. Les dispositions (`ch.settings.layout`, `layout-<onglet>`) acceptent maintenant un tableau de titres pour une ligne côte à côte, les anciennes restent valides. Ressources et Emplacements restent côte à côte après un déplacement. Sous 520 px, les lignes s'empilent. Lâcher hors de la page ou Échap annule. Pendant le glisser, les champs de saisie ne captent plus le dépôt (sinon le titre était collé dans la zone de texte).

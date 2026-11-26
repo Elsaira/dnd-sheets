@@ -33,8 +33,20 @@
           h("button", { class: ["tab", (App.ui.tab === id || (id === "combat" && content === combat)) && "active"], role: "tab", "data-action": "tab", "data-tab": id }, label))),
         h("div", { class: "page" },
           s.warnings.length ? h("div", { class: "banner warn" }, s.warnings.map((w) => h("div", null, w))) : null,
-          content(App))));
+          content === combat ? combat(App) : arrange(App.ch, App.ui.tab, content(App)))));
   };
+
+  function arrange(ch, tab, root) {
+    const name = "layout-" + tab, kids = [...root.children], cards = kids.filter((c) => c.matches("section.card"));
+    const order = ch.settings[name] ? ch.settings[name][0] : [];
+    const rank = (c) => { const i = order.indexOf(cardKey(c)); return i < 0 ? order.length + cards.indexOf(c) : i; };
+    const sorted = cards.slice().sort((a, b) => rank(a) - rank(b));
+    root.replaceChildren(...kids.map((c) => (cards.includes(c) ? sorted.shift() : c)));
+    if (ch.settings[name]) root.append(h("div", { class: "row end" }, h("button", { class: "small", "data-action": "resetLayout", "data-layout": name }, "Disposition par défaut")));
+    root.classList.add("card-col");
+    root.dataset.layout = name;
+    return foldCards(ch, root, tab + ":");
+  }
 
   // --- Colonne de gauche ---
   function abilities(s) {
@@ -117,20 +129,20 @@
       cols = ch.settings.layout.map((keys) => keys.map((k) => byKey.get(k)).filter(Boolean));
       cols.forEach((col) => col.forEach((c) => byKey.delete(cardKey(c))));
       for (const c of byKey.values()) cols[left.includes(c) ? 0 : 1].push(c);
-      cols[1].push(h("div", { class: "row end" }, h("button", { class: "small", "data-action": "resetLayout" }, "Disposition par défaut")));
+      cols[1].push(h("div", { class: "row end" }, h("button", { class: "small", "data-action": "resetLayout", "data-layout": "layout" }, "Disposition par défaut")));
     } else {
       const attackPair = attackCards.length > 1 ? h("div", { class: ["attack-support-pair", supports && healing && "support-healing-grid"] }, attackCards) : attackCards[0];
       cols = [left, [attackPair, resourceCards.length ? h("div", { class: "resource-pair" }, resourceCards) : null, ...right.slice(attackCards.length + resourceCards.length)]];
     }
-    return foldCards(ch, h("div", { class: "grid2 combat-grid" }, cols.map((c) => h("div", { class: "combat-col" }, c))));
+    return foldCards(ch, h("div", { class: "grid2 combat-grid", "data-layout": "layout" }, cols.map((c) => h("div", { class: "combat-col card-col" }, c))), "");
   }
 
   const cardKey = (c) => c.querySelector(":scope > h3").textContent;
 
-  function foldCards(ch, root) {
+  function foldCards(ch, root, prefix) {
     const folded = ch.settings.folded || {};
     for (const t of root.querySelectorAll("section.card > h3")) {
-      const key = t.textContent, card = t.parentNode;
+      const key = prefix + t.textContent, card = t.parentNode;
       t.draggable = true;
       t.classList.add("fold-head");
       if (card.classList.contains("hp")) { t.title = "Glisser pour déplacer"; continue; }
@@ -145,14 +157,14 @@
   const clearDrop = () => document.querySelectorAll(".drop-before, .drop-end").forEach((x) => x.classList.remove("drop-before", "drop-end"));
   const dropTarget = (col, y) => [...col.querySelectorAll("section.card")].find((c) => { const r = c.getBoundingClientRect(); return y < r.top + r.height / 2; });
   document.addEventListener("dragstart", (ev) => {
-    const t = ev.target.closest && ev.target.closest(".combat-col section.card > h3");
+    const t = ev.target.closest && ev.target.closest(".card-col section.card > h3");
     if (!t) return;
     dragKey = t.textContent;
     ev.dataTransfer.effectAllowed = "move";
     ev.dataTransfer.setData("text/plain", dragKey);
   });
   document.addEventListener("dragover", (ev) => {
-    const col = dragKey && ev.target.closest(".combat-col");
+    const col = dragKey && ev.target.closest(".card-col");
     if (!col) return;
     ev.preventDefault();
     clearDrop();
@@ -160,15 +172,16 @@
     (before || col).classList.add(before ? "drop-before" : "drop-end");
   });
   document.addEventListener("drop", (ev) => {
-    const col = dragKey && ev.target.closest(".combat-col");
+    const col = dragKey && ev.target.closest(".card-col");
     if (!col) return;
     ev.preventDefault();
     const before = dropTarget(col, ev.clientY), key = dragKey;
-    const cols = [...document.querySelectorAll(".combat-col")].map((c) => [...c.querySelectorAll("section.card")].map(cardKey).filter((k) => k !== key));
-    const target = cols[[...document.querySelectorAll(".combat-col")].indexOf(col)];
+    const box = col.closest("[data-layout]"), all = box.matches(".card-col") ? [box] : [...box.querySelectorAll(".card-col")];
+    const cols = all.map((c) => [...c.querySelectorAll("section.card")].map(cardKey).filter((k) => k !== key));
+    const target = cols[all.indexOf(col)];
     const i = before ? target.indexOf(cardKey(before)) : -1;
     target.splice(i < 0 ? target.length : i, 0, key);
-    DND.app.update((ch) => { ch.settings.layout = cols; });
+    DND.app.update((ch) => { ch.settings[box.dataset.layout] = cols; });
   });
   document.addEventListener("dragend", () => { dragKey = null; clearDrop(); });
 
@@ -790,7 +803,7 @@
     concentrationSlot: (d, value) => DND.app.update((ch) => { ch.state.concentrationSlot = { name: ch.state.concentration, level: Number(value) }; }),
     endConcentration: () => DND.app.update((ch) => { ch.state.concentration = ""; }),
     inspiration: () => DND.app.update((ch) => { ch.state.heroicInspiration = !ch.state.heroicInspiration; }),
-    resetLayout: () => DND.app.update((ch) => { delete ch.settings.layout; }),
+    resetLayout: (d) => DND.app.update((ch) => { delete ch.settings[d.layout]; }),
     foldCard: (d) => DND.app.update((ch) => { const f = ch.settings.folded = ch.settings.folded || {}; if (f[d.card]) delete f[d.card]; else f[d.card] = true; }),
     toggleAction: (d) => { const o = DND.app.ui.openActions; o[d.name] = !o[d.name]; DND.app.render(); },
     removeSpell: (d) => DND.app.update((ch) => { ch.spells.splice(Number(d.index), 1); }),

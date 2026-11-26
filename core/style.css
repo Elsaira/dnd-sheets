@@ -203,7 +203,7 @@ tr.dim td { opacity: .6; }
 .action > :not(.action-head) { margin-left: .9rem; }
 .combat-col { min-height: 4rem; }
 .drop-before { box-shadow: 0 -3px 0 var(--accent); }
-.combat-col.drop-end { box-shadow: inset 0 -3px 0 var(--accent); }
+.card-col.drop-end { box-shadow: inset 0 -3px 0 var(--accent); }
 .fold-head { cursor: pointer; display: flex; justify-content: space-between; }
 .fold-head::after { content: "▾"; color: var(--muted); }
 .folded > .fold-head::after { content: "▸"; }

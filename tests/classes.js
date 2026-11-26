@@ -66,6 +66,7 @@ module.exports = function (DND, eq) {
   ch.spells = [{ id: "sacred-flame", source: "cleric" }, { id: "bless", source: "cleric" }, { id: "toll-the-dead", source: "cleric" }];
   s = E.compute(ch);
   eq("Glas : 1d8, 1d12 si blessée", [s.attacks.find((a) => a.name === "Glas").damage, s.attacks.find((a) => a.name === "Glas").alt], ["1d8 nécrotique", "1d12 si blessée"]);
+  eq("Dés des soins copiables", E.diceIn(E.compute({ ...ch, spells: [{ id: "cure-wounds", source: "cleric" }] }).spells.find((sp) => sp.spell.id === "cure-wounds").heal).command, "2d8+3");
   eq("Clerc 1 : PV 8 + CON 2", s.hp.max, 10);
   eq("Clerc 1 : DD 13, 3 sorts mineurs, 4 sorts préparés, 2 emplacements", [s.casting[0].dc, s.casting[0].cantrips, s.casting[0].prepared, s.spellSlots[0].max], [13, 3, 4, 2]);
   eq("Thaumaturge : Assistance en plus", !!s.spells.find((x) => x.spell.id === "guidance" && x.alwaysPrepared), true);

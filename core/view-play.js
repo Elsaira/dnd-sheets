@@ -10,10 +10,13 @@
   const rolls = (bonus, label, hint, info) => h("span", { class: "rolls" }, [["N", "", "normal"], ["A", "adv", "avec avantage"], ["D", "dis", "avec désavantage"]].map(([t, mode, text]) =>
     h("button", { class: ["roll", "roll-" + t, hint === t && "hint"], "data-action": "roll", "data-roll": cmd(E.rollCommand(bonus, mode)),
       title: label + " " + text + " : copier « " + cmd(E.rollCommand(bonus, mode)) + " »" + (info ? "\n" + info : "") }, t)));
-  const damageRoll = (text, label, info) => {
-    const d = E.diceIn(text);
-    return d ? [text.slice(0, d.index), h("button", { class: "roll-dmg", "data-action": "roll", "data-roll": cmd(d.command), title: "Dégâts de " + label + " : copier « " + cmd(d.command) + " »" + (info ? "\n" + info : "") }, d.text), text.slice(d.index + d.text.length)] : text;
+  const diceRolls = (text, title, info) => {
+    const out = [];
+    for (let d; text && (d = E.diceIn(text)); text = text.slice(d.index + d.text.length))
+      out.push(text.slice(0, d.index), h("button", { class: "roll-dmg", "data-action": "roll", "data-roll": cmd(d.command), title: title + " : copier « " + cmd(d.command) + " »" + (info ? "\n" + info : "") }, d.text));
+    return out.concat(text || []);
   };
+  const damageRoll = (text, label, info) => diceRolls(text, "Dégâts de " + label, info);
 
   DND.views.play = function (App) {
     const s = App.sheet, ch = App.ch;
@@ -464,7 +467,7 @@
           h("span", { class: "support-spell-name", "data-action": "toggleAction", "data-name": a.name.fr, title: open ? "Masquer le texte" : resourceText(r, a) },
             actionMarker(a.actionType), h("b", null, a.name.fr)),
           h("span", { class: "small-text muted" }, ACTION_TYPES[a.actionType] || a.actionType),
-          open ? h("div", { class: "small-text resource-text" }, resourceText(r, a)) : null);
+          open ? h("div", { class: "small-text resource-text" }, diceRolls(resourceText(r, a), a.name.fr)) : null);
       })));
   }
 
@@ -480,7 +483,7 @@
             spell.custom ? h("b", null, spell.name.fr)
               : h("a", { href: DND.config.spellUrl(spell), target: "_blank", rel: "noopener", title: "EN : " + spell.name.en + " · description complète sur AideDD" }, spell.name.fr)),
           h("span", { class: "small-text muted" }, info + (spell.concentration ? " · Concentration" : "")),
-          sp.heal ? h("b", { class: "healing-value" }, sp.heal) : null);
+          sp.heal ? h("b", { class: "healing-value" }, diceRolls(sp.heal, "Soins de " + spell.name.fr)) : null);
       })));
   }
 
@@ -609,7 +612,7 @@
         h("ul", { class: "spells" }, s.actions.filter((a) => a.resource === r.id).map((a) => h("li", { class: "spell" },
           h("div", { class: "spell-main" }, actionMarker(a.actionType), h("b", { title: "EN : " + a.name.en }, a.name.fr),
             h("span", { class: "muted small-text" }, " · " + (ACTION_TYPES[a.actionType] || a.actionType)),
-            Array.isArray(a.description) ? traitList(a.description) : h("div", { class: "small-text" }, resourceText(r, a))),
+            Array.isArray(a.description) ? traitList(a.description) : h("div", { class: "small-text" }, diceRolls(resourceText(r, a), a.name.fr))),
           h("div", { class: "spell-side" }, h("small", { class: "muted" }, a.source))))))),
       Object.keys(byLevel).sort((a, b) => a - b).map((lvl) => h("section", { class: "card" },
         h("h3", null, lvl === "0" ? "Tours de magie" : "Niveau " + lvl),
@@ -627,9 +630,10 @@
     if (spell.ritual) tags.push(h("span", { class: "tag", title: "Rituel" }, "R"));
     if (sp.atWill) tags.push(h("span", { class: "tag", title: "Sans emplacement de sort" }, "à volonté"));
     const effect = [];
-    if (spell.attack) effect.push("Attaque " + sg(sp.attack));
+    if (spell.attack) effect.push(["Attaque " + sg(sp.attack), rolls(sp.attack, "Attaque " + spell.name.fr)]);
     if (spell.save && sp.dc) effect.push("JS " + DND.data.labels[spell.save].short + " DD " + sp.dc);
-    if (sp.damage) effect.push(sp.damage + (sp.damageAlt ? " (" + sp.damageAlt + ")" : ""));
+    if (sp.damage) effect.push([damageRoll(sp.damage, spell.name.fr), sp.damageAlt ? [" (", damageRoll(sp.damageAlt, spell.name.fr), ")"] : null]);
+    if (sp.heal) effect.push(diceRolls(sp.heal, "Soins de " + spell.name.fr));
     return h("li", { class: "spell" },
       h("div", { class: "spell-main" },
         actionMarker(sp.castingTime),
@@ -638,7 +642,7 @@
         tags,
         (() => { const info = [CAST[sp.castingTime] || sp.castingTime, E.range(spell.range), (up && up.duration) || spell.duration].filter(Boolean).join(" · ");
           return info ? h("span", { class: "muted small-text" }, " · " + info) : null; })(),
-        effect.length ? h("div", { class: "small-text" }, effect.join(" · ")) : null,
+        effect.length ? h("div", { class: "small-text" }, effect.map((e, i) => [i ? " · " : null, e])) : null,
         spell.notes ? h("div", { class: "small-text muted" }, spell.notes) : null,
         sp.upcast ? upcastLine(sp) : null),
       h("div", { class: "spell-side" },

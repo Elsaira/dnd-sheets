@@ -195,7 +195,7 @@
     roll: (d, el) => {
       const fallback = () => { const t = document.createElement("textarea"); t.value = d.roll; document.body.append(t); t.select(); document.execCommand("copy"); t.remove(); };
       try { navigator.clipboard.writeText(d.roll).catch(fallback); } catch (e) { fallback(); }
-      App.toast("Copié : " + d.roll + " (tapez /roll puis collez)", false, 3000);
+      App.toast("Copié : " + d.roll, false, 3000);
       el.classList.add("copied");
       setTimeout(() => el.classList.remove("copied"), 800);
     },

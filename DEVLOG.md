@@ -1,5 +1,9 @@
 # Journal de développement : fiches D&D 5.5 (règles 2024)
 
+## 2026-11-26 : Jets copiés au format « /roll dice: »
+
+Demandé par Plouf : son ami a trouvé que Dice Maiden accepte un message collé de la forme `/roll dice: 1d20+5`. Les boutons N / A / D et les dés des dégâts copient donc `/roll dice: 1d20+5`, `/roll dice: 2d20 k1+5`, `/roll dice: 2d20 kl1+5`, `/roll dice: 1d8+3` (préfixe ajouté dans core/view-play.js, `E.rollCommand` et `E.diceIn` inchangés). Remplace la règle « jamais /roll » du 2026-11-15. 528 tests.
+
 ## 2026-11-26 : Remplir le vide sous une carte courte
 
 Demandé par Plouf : dans une rangée côte à côte, chaque emplacement est maintenant une pile indépendante (`.card-stack`). Glisser une carte dans le vide sous une carte plus courte l'empile dessous ; dans une pile de plusieurs cartes, haut/bas d'une carte = avant/après dans la pile. Format des dispositions : une rangée est un tableau de piles, une pile est un titre ou un tableau de titres (`[["Attaques", "Ressources"], "Sorts de soutien"]`) ; les anciennes dispositions restent valides.

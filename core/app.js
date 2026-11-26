@@ -52,6 +52,7 @@
     if (App.sheet.accent) root.style.setProperty("--accent-base", App.sheet.accent);
     else root.style.removeProperty("--accent-base");
     root.classList.add("paper");
+    if (pref("theme")) root.dataset.theme = pref("theme"); else delete root.dataset.theme;
   }
 
   // --- Accès aux données par chemin : "classes.0.level" ---
@@ -151,13 +152,16 @@
     const firstClass = App.ch.classes[0] && DND.modules.class[App.ch.classes[0].id];
     const classColor = (firstClass && firstClass.color) || "#8a2a2a";
     return [h("h2", null, "Options"),
+      h("div", { class: "option-row" }, h("span", null, "Thème"),
+        h("select", { "data-change": "setTheme", value: pref("theme") || "" },
+          h("option", { value: "" }, "Kraft"), h("option", { value: "grey" }, "Gris sombre"))),
       h("div", { class: "option-row" }, h("span", null, "Couleur d'accent"),
         h("select", { "data-change": "setAccentPreset", value: accentChoice(App.ch.settings.accent) },
           h("option", { value: "" }, firstClass ? "Ma classe (" + firstClass.name.fr + ")" : "Par défaut"),
           DND.data.accentPresets.map((p) => h("option", { value: p.id }, p.fr)),
           h("option", { value: "custom" }, "Personnalisée")),
         h("input", { type: "color", value: App.ch.settings.accent || classColor, "data-change": "setAccent", "aria-label": "Couleur personnalisée" })),
-      h("p", { class: "muted small-text" }, "La couleur est enregistrée avec ce personnage."),
+      h("p", { class: "muted small-text" }, "Le thème est enregistré dans ce navigateur, la couleur avec ce personnage."),
       h("div", { class: "row end" }, h("button", { class: "primary", "data-action": "closeModal" }, "Fermer"))];
   }
 
@@ -200,6 +204,7 @@
       const p = DND.data.accentPresets.find((x) => x.id === value);
       App.update((ch) => { ch.settings.accent = p ? p.color : ""; });
     },
+    setTheme: (d, value) => { pref("theme", value || null); App.setUi({}); },
     setAccent: (d, value) => App.update((ch) => { ch.settings.accent = value; }),
     resetAccent: () => App.update((ch) => { ch.settings.accent = ""; }),
     export: () => DND.storage.exportFile(App.ch),

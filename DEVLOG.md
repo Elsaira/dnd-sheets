@@ -1,5 +1,9 @@
 # Journal de développement : fiches D&D 5.5 (règles 2024)
 
+## 2026-11-26 : Combat sur deux colonnes en fenêtre étroite
+
+Signalé par Plouf (second écran) : entre 901 et 1100 px, Attaques, Sorts de soutien et Ressources passaient sous Points de vie et Concentration. La grille Combat garde deux colonnes jusqu'à 800 px, la colonne de gauche prend au plus 40 % (29rem max). Sous 900 px, caractéristiques sur une ligne de 6 et Compétences / Valeurs passives / Maîtrises sur deux colonnes en bas (au lieu de cartes fixes de 14rem) ; tout sur une colonne sous 640 px. Tableau des attaques : colonnes Nom/Dégâts plus larges, mots plus coupés au milieu. Dés de vie : jusqu'à 75 % de la ligne pour rester sur une ligne.
+
 ## 2026-11-15 : Stabilisation en action bonus (Sépulcre)
 
 Signalé par Plouf : la pastille de Stabilisation restait « Action » pour le Domaine du Sépulcre. Nouveau type d'effet générique `castingTime` (`{ spell, value }`) : le moteur pose `castingTime` sur chaque sort de la fiche (et sur ses attaques), les vues le lisent au lieu de `spell.castingTime`. Cercle de mortalité (niv. 3) l'utilise pour Stabilisation. 513 tests.

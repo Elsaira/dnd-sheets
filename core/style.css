@@ -65,7 +65,7 @@ label { display: inline-flex; align-items: center; gap: .3rem; }
 .play { display: grid; grid-template-columns: 14rem minmax(0, 1fr); gap: .8rem; padding: .8rem 1rem; align-items: start; }
 .left { position: sticky; top: 4.2rem; }
 .narrow-sidebar-card { width: 14rem; max-width: 100%; }
-.combat-grid { grid-template-columns: minmax(0, 29rem) minmax(0, 1fr); }
+.grid2.combat-grid { grid-template-columns: minmax(0, min(29rem, 40%)) minmax(0, 1fr); }
 .empty, .build { padding: .8rem 1rem; max-width: 1100px; }
 
 .abilities { display: grid; grid-template-columns: repeat(3, 1fr); gap: .4rem; width: 14rem; max-width: 100%; margin-bottom: .7rem; }
@@ -164,6 +164,7 @@ button.chip.on .chip-mark { color: #fff; }
 .slot-regain { display: flex; align-items: center; flex-wrap: wrap; gap: .3rem; padding-left: .2rem; }
 .resource > .res-name { flex: 1 1 auto; min-width: 0; }
 .resource > .pips, .resource > .row, .resource > .counter { flex: 0 0 auto; max-width: 60%; justify-content: flex-end; }
+.hit-dice .resource > .pips { max-width: 75%; }
 .counter { white-space: nowrap; }
 
 table { width: 100%; border-collapse: collapse; }
@@ -171,11 +172,11 @@ th { text-align: left; font-size: .75rem; color: var(--muted); text-transform: u
 td { padding: .25rem .3rem; border-top: 1px solid var(--border); vertical-align: middle; }
 tr.dim td { opacity: .6; }
 .compact-table { table-layout: fixed; font-size: .8rem; }
-.compact-table th, .compact-table td { padding: .18rem .25rem; overflow-wrap: anywhere; }
-.compact-table th:nth-child(1) { width: 22%; }
-.compact-table th:nth-child(2) { width: 25%; }
-.compact-table th:nth-child(3) { width: 28%; }
-.compact-table th:nth-child(4) { width: 25%; }
+.compact-table th, .compact-table td { padding: .18rem .25rem; overflow-wrap: break-word; }
+.compact-table th:nth-child(1) { width: 31%; }
+.compact-table th:nth-child(2) { width: 19%; }
+.compact-table th:nth-child(3) { width: 30%; }
+.compact-table th:nth-child(4) { width: 20%; }
 .compact-table th + th, .compact-table td + td { border-left: 1px solid var(--border); padding-left: .4rem; }
 .action-cost-marker { display: inline-block; flex: 0 0 auto; vertical-align: middle; margin-right: .3rem; }
 .action-cost-action { width: .48rem; height: .48rem; border-radius: 50%; background: var(--good); }
@@ -221,16 +222,25 @@ tr.dim td { opacity: .6; }
 .toast { position: fixed; bottom: 1rem; left: 50%; transform: translateX(-50%); background: var(--text); color: var(--bg); padding: .6rem 1rem; border-radius: 8px; max-width: 90vw; z-index: 30; cursor: pointer; box-shadow: 0 4px 16px rgba(0,0,0,.3); }
 
 @media (max-width: 900px) {
-  .play { display: flex; flex-direction: column; align-items: stretch; }
   .left { display: contents; }
   .main { order: 1; }
   .left .card { order: 2; }
   .grid2 { grid-template-columns: 1fr; }
+  .play { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .abilities, .main { grid-column: 1 / -1; }
+  .abilities { width: auto; grid-template-columns: repeat(6, 1fr); }
+  .narrow-sidebar-card { width: auto; }
+  .left .card:has(.skills) { grid-row: span 2; }
 }
-@media (min-width: 901px) and (max-width: 1100px) {
-  .combat-grid { grid-template-columns: 1fr; }
+@media (max-width: 800px) {
+  .grid2.combat-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 640px) {
+  .play { grid-template-columns: 1fr; }
+  .left .card:has(.skills) { grid-row: auto; }
 }
 @media (max-width: 520px) {
+  .abilities { grid-template-columns: repeat(3, 1fr); }
   .resource-pair { grid-template-columns: 1fr; gap: 0; }
 }
 @media (min-width: 1900px) {

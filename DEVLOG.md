@@ -1,5 +1,9 @@
 # Journal de développement : fiches D&D 5.5 (règles 2024)
 
+## 2026-11-26 : Cartes côte à côte et aperçu animé du glisser-déposer
+
+Demandé par Plouf. Pendant le glisser, la carte prend sa future place en direct et les autres glissent (animation FLIP de 160 ms). Lâcher sur le bord gauche ou droit d'une carte (20 % de sa largeur, après 0,3 s) la met côte à côte avec elle, 3 cartes au plus par ligne ; haut/bas = avant/après. Les dispositions (`ch.settings.layout`, `layout-<onglet>`) acceptent maintenant un tableau de titres pour une ligne côte à côte, les anciennes restent valides. Ressources et Emplacements restent côte à côte après un déplacement. Sous 520 px, les lignes s'empilent. Lâcher hors de la page ou Échap annule. Pendant le glisser, les champs de saisie ne captent plus le dépôt (sinon le titre était collé dans la zone de texte).
+
 ## 2026-11-26 : Dons rappelés dans Actions spéciales
 
 Demandé par Plouf (Comédien n'apparaissait que dans Aptitudes). Revue des 75 dons : `combat` ajouté aux 12 qui servent en jeu sans action déjà déclarée : Comédien (DD d'Intuition calculé), Chef cuisinier (PV temporaires des friandises), Guérisseur, Esprit affûté, Observateur, Maître des boucliers (DD du Coup de bouclier) et les faveurs de déplacement dimensionnel, destin, vigueur, récupération, mémoire magique et esprit nocturne. Les dons purement calculés (maîtrises, caractéristiques, CA, PV) ou de sorts (onglet Sorts) n'y sont pas, ni Figure de proue, Musicien et Façonneur (effets hors combat, après un repos).

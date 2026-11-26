@@ -202,8 +202,11 @@ tr.dim td { opacity: .6; }
 .action.open .action-head::before { content: "▾"; }
 .action > :not(.action-head) { margin-left: .9rem; }
 .combat-col { min-height: 4rem; }
-.drop-before { box-shadow: 0 -3px 0 var(--accent); }
-.card-col.drop-end { box-shadow: inset 0 -3px 0 var(--accent); }
+.card-row { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 0 .7rem; align-items: start; }
+.card-row > .card { min-width: 0; }
+.card-row .card input { max-width: 100%; }
+.is-dragging .card-col :is(input, textarea, select, button) { pointer-events: none; }
+.dragging { opacity: .4; outline: 2px dashed var(--accent); }
 .fold-head { cursor: pointer; display: flex; justify-content: space-between; }
 .fold-head::after { content: "▾"; color: var(--muted); }
 .folded > .fold-head::after { content: "▸"; }
@@ -256,6 +259,7 @@ tr.dim td { opacity: .6; }
   .left .card:has(.skills) { grid-row: auto; }
 }
 @media (max-width: 520px) {
+  .card-row { grid-auto-flow: row; }
   .abilities { grid-template-columns: repeat(3, 1fr); }
   .resource-pair { grid-template-columns: 1fr; gap: 0; }
 }
@@ -320,7 +324,7 @@ html.paper .main > .tabs .tab.active {
   border-top: 3px solid var(--accent); padding-top: calc(.4rem - 2px);
 }
 html.paper .page {
-  background: var(--paper); border: 1px solid var(--paper-edge); border-radius: 0 10px 10px 10px;
+  background: var(--paper); border: 1px solid var(--paper-edge); border-radius: 10px;
   padding: .8rem; box-shadow: 0 3px 10px rgba(40,25,10,.15);
 }
 html.paper .page .card { box-shadow: 0 1px 3px rgba(40,25,10,.1); }

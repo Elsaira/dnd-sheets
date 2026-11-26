@@ -38,10 +38,14 @@
 
   function arrange(ch, tab, root) {
     const name = "layout-" + tab, kids = [...root.children], cards = kids.filter((c) => c.matches("section.card"));
-    const order = ch.settings[name] ? ch.settings[name][0] : [];
+    const layout = ch.settings[name] ? ch.settings[name][0] : [], order = layout.flat();
     const rank = (c) => { const i = order.indexOf(cardKey(c)); return i < 0 ? order.length + cards.indexOf(c) : i; };
     const sorted = cards.slice().sort((a, b) => rank(a) - rank(b));
     root.replaceChildren(...kids.map((c) => (cards.includes(c) ? sorted.shift() : c)));
+    for (const keys of layout.filter(Array.isArray)) {
+      const group = cards.filter((c) => keys.includes(cardKey(c))).sort((a, b) => rank(a) - rank(b));
+      if (group.length > 1) { const row = h("div", { class: "card-row" }); group[0].before(row); row.append(...group); }
+    }
     if (ch.settings[name]) root.append(h("div", { class: "row end" }, h("button", { class: "small", "data-action": "resetLayout", "data-layout": name }, "Disposition par défaut")));
     root.classList.add("card-col");
     root.dataset.layout = name;
@@ -126,13 +130,13 @@
     let cols;
     if (ch.settings.layout) {
       const byKey = new Map([...left, ...right].map((c) => [cardKey(c), c]));
-      cols = ch.settings.layout.map((keys) => keys.map((k) => byKey.get(k)).filter(Boolean));
-      cols.forEach((col) => col.forEach((c) => byKey.delete(cardKey(c))));
+      const unit = (it) => { const cs = [].concat(it).map((k) => byKey.get(k)).filter(Boolean); cs.forEach((c) => byKey.delete(cardKey(c))); return cs.length > 1 ? h("div", { class: "card-row" }, cs) : cs[0]; };
+      cols = ch.settings.layout.map((items) => items.map(unit).filter(Boolean));
       for (const c of byKey.values()) cols[left.includes(c) ? 0 : 1].push(c);
       cols[1].push(h("div", { class: "row end" }, h("button", { class: "small", "data-action": "resetLayout", "data-layout": "layout" }, "Disposition par défaut")));
     } else {
       const attackPair = attackCards.length > 1 ? h("div", { class: ["attack-support-pair", supports && healing && "support-healing-grid"] }, attackCards) : attackCards[0];
-      cols = [left, [attackPair, resourceCards.length ? h("div", { class: "resource-pair" }, resourceCards) : null, ...right.slice(attackCards.length + resourceCards.length)]];
+      cols = [left, [attackPair, resourceCards.length ? h("div", { class: ["resource-pair", resourceCards.length > 1 && "card-row"] }, resourceCards) : null, ...right.slice(attackCards.length + resourceCards.length)]];
     }
     return foldCards(ch, h("div", { class: "grid2 combat-grid", "data-layout": "layout" }, cols.map((c) => h("div", { class: "combat-col card-col" }, c))), "");
   }
@@ -153,37 +157,87 @@
     return root;
   }
 
-  let dragKey = null;
-  const clearDrop = () => document.querySelectorAll(".drop-before, .drop-end").forEach((x) => x.classList.remove("drop-before", "drop-end"));
-  const dropTarget = (col, y) => [...col.querySelectorAll("section.card")].find((c) => { const r = c.getBoundingClientRect(); return y < r.top + r.height / 2; });
+  let drag = null;
+  const unitOf = (c) => (c.parentNode.matches(".card-row") ? c.parentNode : c);
+  function detach(el) {
+    const p = el.parentNode;
+    el.remove();
+    if (p.matches(".card-row") && p.children.length < 2) p.firstElementChild ? p.replaceWith(p.firstElementChild) : p.remove();
+  }
+  function flip(box, change) {
+    const els = [...box.querySelectorAll("section.card")], was = new Map(els.map((e) => [e, e.getBoundingClientRect()]));
+    change();
+    for (const e of els) {
+      const a = was.get(e), b = e.getBoundingClientRect(), dx = a.left - b.left, dy = a.top - b.top;
+      if (dx || dy) e.animate([{ transform: `translate(${dx}px, ${dy}px)` }, { transform: "none" }], { duration: 160, easing: "ease-out" });
+    }
+    drag.busy = Date.now() + 180;
+  }
+  function placeAt(target, mode, col) {
+    const el = drag.el;
+    detach(el);
+    if (!target) return col.insertBefore(el, col.querySelector(":scope > .row.end"));
+    if (mode === "before" || mode === "after") return unitOf(target)[mode](el);
+    let row = target.parentNode;
+    if (!row.matches(".card-row")) { row = h("div", { class: "card-row" }); target.replaceWith(row); row.append(target); }
+    target[mode === "left" ? "before" : "after"](el);
+  }
+  const layoutOf = (box) => (box.matches(".card-col") ? [box] : [...box.querySelectorAll(".card-col")]).map((col) => [...col.children].flatMap((el) => {
+    if (el.matches("section.card")) return [cardKey(el)];
+    if (!el.matches(".card-row")) return [...el.querySelectorAll("section.card")].map(cardKey);
+    const keys = [...el.querySelectorAll(":scope > section.card")].map(cardKey);
+    return keys.length > 1 ? [keys] : keys;
+  }));
   document.addEventListener("dragstart", (ev) => {
     const t = ev.target.closest && ev.target.closest(".card-col section.card > h3");
     if (!t) return;
-    dragKey = t.textContent;
+    const el = t.parentNode;
+    drag = { el, box: el.closest("[data-layout]"), busy: 0, last: "" };
     ev.dataTransfer.effectAllowed = "move";
-    ev.dataTransfer.setData("text/plain", dragKey);
+    ev.dataTransfer.setData("text/plain", t.textContent);
+    setTimeout(() => { el.classList.add("dragging"); document.body.classList.add("is-dragging"); });
   });
   document.addEventListener("dragover", (ev) => {
-    const col = dragKey && ev.target.closest(".card-col");
-    if (!col) return;
+    const col = drag && ev.target.closest(".card-col");
+    if (!col || !drag.box.contains(col)) return;
     ev.preventDefault();
-    clearDrop();
-    const before = dropTarget(col, ev.clientY);
-    (before || col).classList.add(before ? "drop-before" : "drop-end");
+    ev.dataTransfer.dropEffect = "move";
+    if (Date.now() < drag.busy) return;
+    let target = ev.target.closest("section.card"), mode = "end";
+    if (target && (target === drag.el || drag.el.contains(target) || !col.contains(target))) return;
+    if (target) {
+      const r = target.getBoundingClientRect(), x = (ev.clientX - r.left) / r.width;
+      const full = target.parentNode.matches(".card-row") && target.parentNode.children.length >= 3 && target.parentNode !== drag.el.parentNode;
+      mode = !full && x < 0.2 ? "left" : !full && x > 0.8 ? "right" : ev.clientY < r.top + r.height / 2 ? "before" : "after";
+    } else {
+      const last = [...col.children].filter((e) => !e.matches(".row.end")).pop();
+      if (last && ev.clientY < last.getBoundingClientRect().bottom) return;
+    }
+    const key = (target ? cardKey(target) : "") + mode + [...document.querySelectorAll(".card-col")].indexOf(col);
+    if (key === drag.last) return;
+    if (mode === "left" || mode === "right") {
+      if (drag.wait !== key) { drag.wait = key; drag.since = Date.now(); return; }
+      if (Date.now() - drag.since < 300) return;
+    }
+    drag.last = key;
+    flip(drag.box, () => placeAt(target, mode, col));
   });
   document.addEventListener("drop", (ev) => {
-    const col = dragKey && ev.target.closest(".card-col");
-    if (!col) return;
+    if (!drag || !ev.target.closest(".card-col")) return;
     ev.preventDefault();
-    const before = dropTarget(col, ev.clientY), key = dragKey;
-    const box = col.closest("[data-layout]"), all = box.matches(".card-col") ? [box] : [...box.querySelectorAll(".card-col")];
-    const cols = all.map((c) => [...c.querySelectorAll("section.card")].map(cardKey).filter((k) => k !== key));
-    const target = cols[all.indexOf(col)];
-    const i = before ? target.indexOf(cardKey(before)) : -1;
-    target.splice(i < 0 ? target.length : i, 0, key);
-    DND.app.update((ch) => { ch.settings[box.dataset.layout] = cols; });
+    drag.dropped = true;
   });
-  document.addEventListener("dragend", () => { dragKey = null; clearDrop(); });
+  document.addEventListener("dragend", (ev) => {
+    if (!drag) return;
+    const { el, box, dropped, last } = drag, r = box.getBoundingClientRect();
+    drag = null;
+    el.classList.remove("dragging");
+    document.body.classList.remove("is-dragging");
+    if (dropped || (last && ev.clientX >= r.left && ev.clientX <= r.right && ev.clientY >= r.top && ev.clientY <= r.bottom)) {
+      const cols = layoutOf(box);
+      DND.app.update((ch) => { ch.settings[box.dataset.layout] = cols; });
+    } else DND.app.render();
+  });
 
   function hpCard(App) {
     const s = App.sheet, ch = App.ch;

@@ -284,7 +284,7 @@
       st.concentration ? (st.concentrationChecks || []).map((dc, i) => {
         const cs = App.sheet.concentrationSave, adv = cs.advantage.length;
         return h("div", { class: "row conc-check", title: adv ? "Avantage : " + cs.advantage.join(", ") : null },
-          h("span", { class: "grow nowrap" }, "JS Con ", h("b", null, "DD " + dc), " " + sg(cs.bonus), adv ? h("span", { class: "adv" }, " A") : null),
+          h("span", { class: "grow nowrap" }, "JS Con " + sg(cs.bonus), adv ? h("span", { class: "adv" }, " A") : null, " ", h("b", null, "DD " + dc)),
           rolls(cs.bonus, "JS de Concentration", adv ? "A" : null),
           h("button", { class: "small", "data-action": "concentrationCheck", "data-i": i, title: "Réussi : retirer ce jet" }, "✓"),
           h("button", { class: "small danger", "data-action": "endConcentration", title: "Échoué : fin de la concentration" }, "✗"));

@@ -5,7 +5,7 @@ registerModule({
   description: "+1 à une caractéristique (max 30). ±2d4 sur un test de d20 proche",
   prerequisite: DND.feat.requires({ level: 19 }, "Niveau 19"),
   features: [
-    { id: "boon-of-fate", name: { fr: "Faveur du destin", en: "Boon of Fate" },
+    { id: "boon-of-fate", combat: "Vous ou une créature à 18 m ou moins réussissez ou ratez un test d20 : lancez 2d4 et appliquez-les en bonus ou en malus (case Améliorer le destin).", name: { fr: "Faveur du destin", en: "Boon of Fate" },
       description: "Résumé de mémoire (texte non disponible sur AideDD) : à vérifier dans le Manuel des joueurs. Améliorer le destin : quand vous ou une créature à 18 m ou moins réussissez ou ratez un test de d20, vous pouvez lancer 2d4 et appliquer le total en bonus ou en malus. Ensuite, plus avant votre prochain jet d'initiative ou la fin d'un repos court ou long.",
       effects: [
         DND.feat.ability("abilities", 30),

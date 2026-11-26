@@ -1,5 +1,9 @@
 # Journal de développement : fiches D&D 5.5 (règles 2024)
 
+## 2026-11-26 : Dons rappelés dans Actions spéciales
+
+Demandé par Plouf (Comédien n'apparaissait que dans Aptitudes). Revue des 75 dons : `combat` ajouté aux 12 qui servent en jeu sans action déjà déclarée : Comédien (DD d'Intuition calculé), Chef cuisinier (PV temporaires des friandises), Guérisseur, Esprit affûté, Observateur, Maître des boucliers (DD du Coup de bouclier) et les faveurs de déplacement dimensionnel, destin, vigueur, récupération, mémoire magique et esprit nocturne. Les dons purement calculés (maîtrises, caractéristiques, CA, PV) ou de sorts (onglet Sorts) n'y sont pas, ni Figure de proue, Musicien et Façonneur (effets hors combat, après un repos).
+
 ## 2026-11-26 : Cartes repliables et déplaçables dans tous les onglets
 
 Demandé par Plouf. Sorts, Aptitudes, Inventaire et Notes : clic sur le titre d'une carte pour la replier, glisser le titre pour la déplacer (une colonne). Ordre mémorisé par personnage dans `ch.settings["layout-<onglet>"]`, cartes repliées dans `ch.settings.folded` avec la clé `<onglet>:<titre>` (Combat garde `layout` et ses clés sans préfixe, donc les anciennes sauvegardes restent valables). Bouton « Disposition par défaut » en bas de l'onglet quand l'ordre a été changé.

@@ -5,7 +5,7 @@ registerModule({
   description: "+1 Int, Sag ou Cha (max 30). Un sort de niveau 1 à 4 gratuit par repos long",
   prerequisite: DND.feat.requires({ level: 19, spellcasting: true }, "Niveau 19, capacité Sorts"),
   features: [
-    { id: "boon-of-spell-recall", name: { fr: "Faveur de mémoire magique", en: "Boon of Spell Recall" },
+    { id: "boon-of-spell-recall", combat: "Une fois par repos long : lancez un sort préparé de niveau 1 à 4 sans dépenser l'emplacement.", name: { fr: "Faveur de mémoire magique", en: "Boon of Spell Recall" },
       description: "Résumé de mémoire (texte non disponible sur AideDD) : à vérifier dans le Manuel des joueurs. Incantation gratuite : une fois par repos long, vous pouvez lancer un sort préparé avec un emplacement de niveau 1 à 4 sans dépenser l'emplacement.",
       effects: [
         DND.feat.ability(["int", "wis", "cha"], 30),

@@ -5,7 +5,7 @@ registerModule({
   description: "+1 Int ou Sag. Octroie maîtrise/expertise en Intuition, Investigation ou Perception. Action Cherche en action Bonus",
   prerequisite: DND.feat.requires({ level: 4, scores: ["int", "wis"] }, "Niveau 4, Intelligence ou Sagesse 13"),
   features: [
-    { id: "observant", name: { fr: "Observateur", en: "Observant" },
+    { id: "observant", combat: "Action Observation en action Bonus.", name: { fr: "Observateur", en: "Observant" },
       description: "Observateur attentif : Choisissez l'une des compétences suivantes : Intuition, Investigation ou Perception. Si vous ne maîtrisez pas la compétence choisie, vous la maîtrisez ; si vous la maîtrisez déjà, vous gagnez Expertise pour celle-ci. Observation rapide : Vous pouvez prendre l'action Observation en tant qu'action Bonus.",
       effects: [
         DND.feat.ability(["int", "wis"]),

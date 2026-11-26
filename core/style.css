@@ -348,3 +348,15 @@ input.list-search { width: 12rem; }
 .build-divider { margin: 1.6rem 0 .6rem; padding-top: .8rem; border-top: 2px solid var(--paper-edge); }
 .build-divider h2 { margin: 0; }
 .build-divider p { margin: .2rem 0 0; }
+
+html[data-theme="grey"] {
+  --bg: #1e1e21; --panel: #2a2a2e; --panel-2: #36363b; --text: #e8e8ea; --muted: #a9a9b0; --border: #4b4b52;
+  --accent: color-mix(in oklab, var(--accent-base, #8a2a2a) 62%, #fff); --accent-text: #141416;
+  --good: #6fc173; --bad: #f0786a; --warn: #e0b04a; --shadow: 0 1px 2px rgba(0,0,0,.4);
+  --ability-str-color: #ec7f84; --ability-dex-color: #eba05a; --ability-con-color: #6fcb9b;
+  --ability-int-color: #82aef0; --ability-wis-color: #c09ae0; --ability-cha-color: #ec8cbf;
+  --desk: #161618; --paper: #26262a; --paper-edge: #45454c; --paper-shade: rgba(0,0,0,.3); --ink: #e8e8ea; --field: #323237;
+  color-scheme: dark;
+}
+html[data-theme="grey"].paper .card, html[data-theme="grey"].paper .stat, html[data-theme="grey"].paper .ability, html[data-theme="grey"].paper .modal { box-shadow: 0 2px 6px rgba(0,0,0,.35); }
+html[data-theme="grey"] .count.ok, html[data-theme="grey"] button.chip.on, html[data-theme="grey"] button.chip.on .chip-mark { color: #141416; }

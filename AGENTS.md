@@ -49,7 +49,7 @@ Check before committing: `grep -n -i "cleric\|warlock\|fighter\|paladin\|sorcere
 - Short, efficient code. **Do not add comments.**
 - Code, identifiers and commit messages in English. Every text the player sees in French, with D&D terms as on AideDD (`name: { fr, en }`).
 - Classic scripts on the global `DND` namespace. No modules, bundlers, frameworks, npm packages or network calls.
-- One visual theme (beige kraft) with a per-class accent colour. Do not add light/dark themes or restyle the sheet unless asked.
+- Beige kraft theme by default with a per-class accent colour; an optional "Gris sombre" theme (`html[data-theme="grey"]` in `core/style.css`, chosen in Options, saved per browser) only overrides the colour variables. New colours go in variables so both themes follow. Do not restyle the sheet unless asked.
 
 ## Rules sources
 

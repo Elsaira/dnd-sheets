@@ -1,5 +1,9 @@
 # Journal de développement : fiches D&D 5.5 (règles 2024)
 
+## 2026-11-26 : Thème « Gris sombre » (à tester)
+
+Demandé par Plouf. Options > Thème : Kraft (défaut) ou Gris sombre. Mémorisé dans ce navigateur (`localStorage` `theme`), pas dans le personnage. Le thème gris ne fait que redéfinir les variables de couleur sous `html[data-theme="grey"]` : fonds gris, texte clair, couleur de classe éclaircie (texte sombre dessus), couleurs des caractéristiques, vert/rouge/orange éclaircis pour rester lisibles sur fond sombre. Pastilles de coût d'action inchangées.
+
 ## 2026-11-26 : Cartes Combat déplaçables
 
 Demandé par Plouf. Le titre de chaque carte de l'onglet Combat se glisse-dépose vers l'autre colonne ou à une autre place (trait de couleur = point d'arrivée). Disposition mémorisée par personnage dans `ch.settings.layout` (deux listes de titres) ; une carte nouvelle ou absente de la liste reprend sa colonne par défaut. Bouton « Disposition par défaut » sous la colonne de droite pour revenir à la mise en page d'origine (avec Ressources/Emplacements côte à côte).

@@ -1,5 +1,9 @@
 # Journal de développement : fiches D&D 5.5 (règles 2024)
 
+## 2026-11-26 : Jets copiables dans les sorts, les soins et le Conduit divin
+
+Demandé par Plouf. Onglet Sorts : boutons N / A / D (au survol) sur « Attaque +x » des sorts à jet d'attaque, dés de dégâts (et dégâts alternatifs) cliquables, valeur de soins affichée et cliquable. Carte « Soins » : la valeur de soins copie ses dés. Cartes de ressource `spellTab` (Conduit divin, onglets Sorts et Combat) : chaque expression de dés du texte est cliquable (ex. Étincelle divine `1d8+3`, Radiance de l'Aube `2d10+6`). Nouveau `diceRolls` dans core/view-play.js (toutes les expressions de dés d'un texte), `damageRoll` passe par lui. Seules les valeurs déjà calculées sont copiées, aucun bonus soumis à condition. Après demande de Plouf, onglet Combat : la carte « Conduit divin » montre les dés de chaque option à côté de son nom (sans ouvrir le texte), et le texte déplié des « Actions spéciales » rend ses dés cliquables. 531 tests.
+
 ## 2026-11-26 : Jets copiés au format « /roll dice: »
 
 Demandé par Plouf : son ami a trouvé que Dice Maiden accepte un message collé de la forme `/roll dice: 1d20+5`. Les boutons N / A / D et les dés des dégâts copient donc `/roll dice: 1d20+5`, `/roll dice: 2d20 k1+5`, `/roll dice: 2d20 kl1+5`, `/roll dice: 1d8+3` (préfixe ajouté dans core/view-play.js, `E.rollCommand` et `E.diceIn` inchangés). Remplace la règle « jamais /roll » du 2026-11-15. 530 tests.

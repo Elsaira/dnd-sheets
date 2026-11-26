@@ -107,7 +107,7 @@ html.paper .ability.ability-color { border-top-color: var(--ability-color); }
 .roll.copied, .roll-dmg.copied { background: var(--accent); color: var(--accent-text); border-color: var(--accent); }
 .roll-dmg { font: inherit; padding: 0 .15rem; border: 1px dashed transparent; background: none; color: inherit; text-align: left; }
 .roll-dmg:hover { border-color: var(--accent); }
-.rolls { visibility: hidden; } .skills li:hover .rolls, .attacks tr:hover .rolls, .ability:hover .rolls, .stat:hover .rolls, .rolls:focus-within { visibility: visible; }
+.rolls { visibility: hidden; } .skills li:hover .rolls, .attacks tr:hover .rolls, .spell:hover .rolls, .ability:hover .rolls, .stat:hover .rolls, .rolls:focus-within { visibility: visible; }
 @media (hover: none) { .rolls { visibility: visible; } .ability .rolls, .stat .rolls { position: static; } .ab-save + .rolls { border: none; } }
 .kv { display: flex; justify-content: space-between; padding: .1rem 0; }
 

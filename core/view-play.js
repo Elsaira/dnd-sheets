@@ -22,7 +22,7 @@
         h("button", { class: "primary", "data-action": "mode", "data-mode": "build" }, "Ouvrir la création"));
     }
     // Onglet Sorts seulement si le personnage a des sorts (classe, espèce, don…)
-    const hasSpells = App.sheet.casting.length > 0 || App.sheet.spells.length > 0;
+    const hasSpells = App.sheet.casting.length > 0 || App.sheet.spells.length > 0 || App.sheet.resources.some((r) => r.spellTab);
     const tabs = [["combat", "Combat"], hasSpells && ["spells", "Sorts"], ["features", "Aptitudes"], ["inventory", "Inventaire"], ["notes", "Notes"]].filter(Boolean);
     const content = { combat, spells: hasSpells ? spells : null, features, inventory, notes }[App.ui.tab] || combat;
     return h("div", { class: "play" },
@@ -585,6 +585,15 @@
           addSpellRow(App, c));
       }),
       s.casting.length ? null : h("p", { class: "muted" }, "Pas d'incantation de classe. Les sorts accordés par l'espèce ou les dons apparaissent ci-dessous."),
+      s.resources.filter((r) => r.spellTab).map((r, i, all) => h("section", { class: "card" },
+        h("h3", null, r.name.fr + (all.some((o) => o !== r && o.name.fr === r.name.fr) ? " (" + r.source + ")" : "")),
+        h("div", { class: "resource" }, h("div", { class: "res-name muted small-text" }, RECHARGE[r.recharge] + (r.shortRegain ? " (" + r.shortRegain + " au repos court)" : "")),
+          pips(r.max, r.spent, "resource", { "data-id": r.id })),
+        h("ul", { class: "spells" }, s.actions.filter((a) => a.resource === r.id).map((a) => h("li", { class: "spell" },
+          h("div", { class: "spell-main" }, actionMarker(a.actionType), h("b", { title: "EN : " + a.name.en }, a.name.fr),
+            h("span", { class: "muted small-text" }, " · " + (ACTION_TYPES[a.actionType] || a.actionType)),
+            Array.isArray(a.description) ? traitList(a.description) : h("div", { class: "small-text" }, a.description.replace(new RegExp("^" + r.name.fr + "(?: : |, )"), "").replace(/^./, (x) => x.toUpperCase()))),
+          h("div", { class: "spell-side" }, h("small", { class: "muted" }, a.source))))))),
       Object.keys(byLevel).sort((a, b) => a - b).map((lvl) => h("section", { class: "card" },
         h("h3", null, lvl === "0" ? "Tours de magie" : "Niveau " + lvl),
         h("ul", { class: "spells" }, byLevel[lvl].map((sp) => spellRow(App, sp))))),

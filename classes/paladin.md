@@ -20,7 +20,7 @@ Source : règles 2024, textes et noms d'après [AideDD](https://www.aidedd.org/r
 | 1 | Bottes d'arme (2) | Choix des armes, botte affichée sur l'attaque |
 | 2 | Style de combat | Don de style de combat **ou** Combattant béni (2 sorts mineurs de clerc au Charisme) |
 | 2 | Châtiment de paladin | Châtiment divin toujours préparé + 1 lancer gratuit |
-| 3 | Conduit divin, sous-classe | Compteur ; Perception divine |
+| 3 | Conduit divin, sous-classe | Compteur ; Perception divine ; carte « Conduit divin » dans l'onglet Sorts avec les options du serment |
 | 4, 8 | Amélioration de caractéristique | Choix d'un don (y compris style de combat) |
 | 5 | Attaque supplémentaire, Fidèle destrier | Rappel ; Appel de destrier toujours préparé + 1 lancer gratuit |
 | 6 | Aura de protection | +Charisme (min. +1) à tous vos JS, calculé ; rappel pour les alliés |

@@ -31,7 +31,7 @@
         description: "Nécromancie améliorée : quand vous lancez un sort de nécromancie de niveau 5 ou moins qui cible une seule créature, ou un sort de la table Sorts du Domaine du Sépulcre, vous pouvez dépenser un Conduit divin pour cibler une seconde créature à portée. Les composantes matérielles coûteuses ou consommées sont fournies séparément pour chaque cible. Gardien des âmes : quand un ennemi meurt à 18 m, vous ou une créature que vous voyez à 18 m récupérez 2 × niveau de clerc PV. Vous ne pouvez pas utiliser cette aptitude si vous êtes Neutralisé. Après utilisation, vous devez terminer un repos court ou long, ou dépenser sans action un emplacement de sort de niveau 6 ou supérieur, avant de la réutiliser.",
         effects: [
           { type: "resource", id: "keeperOfSouls", name: n("Gardien des âmes", "Keeper of Souls"), max: 1, recharge: "short", slotRegain: 6, blockedBy: "incapacitated", description: (c) => 2 * lvl(c) + " PV à la mort d'un ennemi à 18 m. Recharge aussi avec un emplacement de niveau 6+." },
-          { type: "note", text: "Nécromancie améliorée : dépensez un Conduit divin pour cibler une seconde créature à portée avec un sort de nécromancie niv. ≤ 5 qui ne cible qu'une créature, ou un sort du Domaine du Sépulcre. Fournissez les composantes coûteuses ou consommées pour chaque cible." },
+          { type: "action", name: n("Nécromancie améliorée", "Improved Necromancy"), actionType: "free", ...cd, description: "Dépensez un Conduit divin pour cibler une seconde créature à portée avec un sort de nécromancie niv. ≤ 5 qui ne cible qu'une créature, ou un sort du Domaine du Sépulcre. Fournissez les composantes coûteuses ou consommées pour chaque cible." },
         ] },
     ],
   }]);

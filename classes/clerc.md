@@ -39,7 +39,7 @@ Source : règles 2024, textes et noms d'après [AideDD](https://www.aidedd.org/r
 - Les sorts de domaine sont toujours préparés, ne comptent pas dans le nombre de sorts préparés et apparaissent aux niveaux 3, 5, 7 et 9.
 
 ## 4. Cas particuliers et décisions
-- **Conduit divin** : un seul compteur pour tous les effets ; chaque action qui le dépense le précise.
+- **Conduit divin** : un seul compteur pour tous les effets ; chaque action qui le dépense le précise. Carte « Conduit divin » dans l'onglet Sorts (`spellTab`, 2026-11-26) avec toutes les options disponibles ; Nécromancie améliorée (Sépulcre) y figure comme action gratuite.
 - **Éclat protecteur amélioré** : le noyau ne sait pas encore changer la récupération d'une ressource selon le niveau (repos long avant 6, court ensuite). La ressource reste « repos long » ; à partir du niveau 6, un rappel dit de rendre les utilisations à la main après un repos court. Correction possible avec un petit ajout générique au noyau (voir DEVLOG).
 - **Incantation puissante** : le bonus s'applique aux sorts mineurs de clerc à dégâts du catalogue (Flamme sacrée, Glas, Mot de radiance).
 - **Oeil du mage** : retiré de la liste du clerc (ce n'est pas un sort de clerc en 2024) ; il reste un sort de domaine de la Lumière.

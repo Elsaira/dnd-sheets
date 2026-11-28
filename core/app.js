@@ -76,7 +76,7 @@
   }
   function onClick(ev) {
     const el = ev.target.closest("[data-action]");
-    if (!el || ev.target.closest("input, select, textarea, label")) return;
+    if (!el || ev.target.closest("input, select, textarea, label, a[href]")) return;
     const fn = App.actions[el.dataset.action];
     if (fn) { ev.preventDefault(); fn(el.dataset, el, ev); }
   }

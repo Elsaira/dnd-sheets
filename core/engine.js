@@ -15,6 +15,7 @@
     const m = /\d+d\d+(\s*[+−-]\s*\d+)?/.exec(text || "");
     return m && { index: m.index, text: m[0], command: m[0].replace(/−/g, "-").replace(/\s/g, "") };
   };
+  E.discordChannel = (text, roll) => { const m = /(\d{5,})\/(\d{5,})/.exec(text || ""); return m && (roll ? "dndroll://" + m[1] + "/" + m[2] + "/" + encodeURIComponent(roll) : "discord://-/channels/" + m[1] + "/" + m[2]); };
 
   // ---------------------------------------------------------------------------
   // Nouveau personnage et mise à niveau des anciennes sauvegardes

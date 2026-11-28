@@ -76,7 +76,7 @@
   }
   function onClick(ev) {
     const el = ev.target.closest("[data-action]");
-    if (!el || el.tagName === "SELECT" || el.tagName === "INPUT" || el.tagName === "TEXTAREA") return;
+    if (!el || ev.target.closest("input, select, textarea, label")) return;
     const fn = App.actions[el.dataset.action];
     if (fn) { ev.preventDefault(); fn(el.dataset, el, ev); }
   }
@@ -125,7 +125,7 @@
         h("button", { "data-action": "openModal", "data-modal": "characters" }, "Personnages"),
         h("button", { "data-action": "export", title: "Télécharger la fiche en fichier .json" }, "Exporter"),
         h("button", { "data-action": "importClick", title: "Charger une fiche .json" }, "Importer"),
-        h("button", { "data-action": "openModal", "data-modal": "options", title: "Apparence de la fiche" }, "Options")));
+        h("button", { "data-action": "openModal", "data-modal": "options", title: "Apparence de la fiche et salon Discord" }, "Options")));
   }
 
   // --- Fenêtres ---
@@ -161,7 +161,18 @@
           DND.data.accentPresets.map((p) => h("option", { value: p.id }, p.fr)),
           h("option", { value: "custom" }, "Personnalisée")),
         h("input", { type: "color", value: App.ch.settings.accent || classColor, "data-change": "setAccent", "aria-label": "Couleur personnalisée" })),
-      h("p", { class: "muted small-text" }, "Le thème est enregistré dans ce navigateur, la couleur avec ce personnage."),
+      h("div", { class: "option-row" }, h("span", null, "Salon Discord"),
+        h("input", { type: "text", class: "grow", value: pref("discordChannel") || "", placeholder: "https://discord.com/channels/…", "data-change": "setDiscord", "aria-label": "Lien du salon Discord" })),
+      pref("discordChannel") && !E.discordChannel(pref("discordChannel"))
+        ? h("p", { class: "small-text bad" }, "Lien non reconnu : faites un clic droit sur le salon, puis « Copier le lien du salon ».")
+        : h("p", { class: "muted small-text" }, "Clic droit sur le salon dans Discord, « Copier le lien du salon », puis collez-le ici. Un clic sur un jet copie la commande et ouvre ce salon dans l'application Discord : il reste à coller (Ctrl+V) et à valider."),
+      E.discordChannel(pref("discordChannel")) ? [
+        h("label", { class: "option-row" }, h("span", null, "Envoi direct"),
+          h("input", { type: "checkbox", checked: pref("discordAuto") === "1", "data-change": "setDiscordAuto" }),
+          h("span", { class: "small-text" }, "Publier le jet sans coller (programme Windows)")),
+        h("p", { class: "muted small-text" }, h("a", { href: "tools/discord-roll.cmd", download: "discord-roll.cmd" }, "Télécharger le programme"),
+          ", puis double-clic dessus une fois pour l'installer (si Windows avertit : « Informations complémentaires », « Exécuter quand même »). Le relancer permet de le désinstaller. Au premier jet, autorisez le navigateur à ouvrir le lien. Ne touchez pas au clavier pendant l'envoi.")] : null,
+      h("p", { class: "muted small-text" }, "Le thème et le salon Discord sont enregistrés dans ce navigateur, la couleur avec ce personnage."),
       h("div", { class: "row end" }, h("button", { class: "primary", "data-action": "closeModal" }, "Fermer"))];
   }
 
@@ -193,9 +204,12 @@
     closeModalBackdrop: (d, el, ev) => { if (ev.target === el) App.setUi({ modal: null }); },
     closeToast: () => App.setUi({ toast: "" }),
     roll: (d, el) => {
-      const fallback = () => { const t = document.createElement("textarea"); t.value = d.roll; document.body.append(t); t.select(); document.execCommand("copy"); t.remove(); };
-      try { navigator.clipboard.writeText(d.roll).catch(fallback); } catch (e) { fallback(); }
-      App.toast("Copié : " + d.roll, false, 3000);
+      const auto = pref("discordAuto") === "1";
+      const url = E.discordChannel(pref("discordChannel"), auto && d.roll);
+      const go = () => { if (url) location.href = url; };
+      const fallback = () => { const t = document.createElement("textarea"); t.value = d.roll; document.body.append(t); t.select(); document.execCommand("copy"); t.remove(); go(); };
+      try { navigator.clipboard.writeText(d.roll).then(go, fallback); } catch (e) { fallback(); }
+      App.toast(url && auto ? "Envoi vers Discord : " + d.roll : "Copié : " + d.roll + (url ? " · Ctrl+V puis Entrée dans Discord" : ""), false, 3000);
       el.classList.add("copied");
       setTimeout(() => el.classList.remove("copied"), 800);
     },
@@ -205,6 +219,8 @@
       App.update((ch) => { ch.settings.accent = p ? p.color : ""; });
     },
     setTheme: (d, value) => { pref("theme", value || null); App.setUi({}); },
+    setDiscord: (d, value) => { pref("discordChannel", value.trim() || null); App.setUi({}); },
+    setDiscordAuto: (d, value) => { pref("discordAuto", value ? "1" : null); App.setUi({}); },
     setAccent: (d, value) => App.update((ch) => { ch.settings.accent = value; }),
     resetAccent: () => App.update((ch) => { ch.settings.accent = ""; }),
     export: () => DND.storage.exportFile(App.ch),

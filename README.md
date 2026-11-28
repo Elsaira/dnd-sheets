@@ -12,6 +12,7 @@ Une fiche claire pour préparer un personnage, suivre ses aventures et garder le
 - Suivre les compétences, maîtrises, langues, valeurs passives et capacités.
 - Consulter les attaques, sorts, ressources, emplacements, états et actions spéciales pendant la partie.
 - Gérer les points de vie, les dés de vie, la concentration et les repos.
+- Copier un jet pour Dice Maiden en un clic et, si le lien du salon est renseigné dans Options, ouvrir ce salon dans l'application Discord pour le coller. Sous Windows, le petit programme proposé dans Options colle et publie le jet automatiquement.
 - Conserver plusieurs personnages dans le navigateur, puis exporter ou importer une fiche au format JSON.
 - Ouvrir les descriptions complètes de nombreux sorts et créatures sur AideDD.
 

@@ -54,6 +54,11 @@ eq("Dés des dégâts d'arme", E.diceIn(s.attacks[0].damage).command, "1d8+3");
 eq("Dés dans un texte", E.diceIn("2 rayons de 1d10 force").command, "1d10");
 eq("Modificateur négatif", E.diceIn("1d6 − 1 contondant").command, "1d6-1");
 eq("Pas de dés", E.diceIn("0 contondant"), null);
+eq("Lien de salon Discord", E.discordChannel("https://discord.com/channels/123456789012345678/987654321098765432"), "discord://-/channels/123456789012345678/987654321098765432");
+eq("Lien de message Discord", E.discordChannel("https://discord.com/channels/111111/222222/333333"), "discord://-/channels/111111/222222");
+eq("Lien Discord non reconnu", E.discordChannel("salon-des-jets"), null);
+eq("Envoi direct d'un jet", E.discordChannel("https://discord.com/channels/111111/222222", "/roll dice: 2d20 k1+5"), "dndroll://111111/222222/%2Froll%20dice%3A%202d20%20k1%2B5");
+eq("Pas de salon Discord", E.discordChannel(null), null);
 
 // 2. Montée de niveau, don au niveau 4, sous-classe
 ch.classes[0].level = 4;

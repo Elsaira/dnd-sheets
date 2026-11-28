@@ -32,6 +32,7 @@ Check before committing: `grep -n -i "cleric\|warlock\|fighter\|paladin\|sorcere
 | `modules/manifest.js` | The list of modules to load, one line each |
 | `classes/<classe>.md`, `modules.md`, `DEVLOG.md` | Per-class notes, cross-cutting module notes, dated change log |
 | `tests/` | `node tests/run.js` |
+| `tools/discord-roll.cmd` | Optional Windows helper downloaded from Options: registers `dndroll://`, then pastes and sends a dice command in the Discord app. Keep CRLF line endings |
 
 ## Adding or changing content
 
